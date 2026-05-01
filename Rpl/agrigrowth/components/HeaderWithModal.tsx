@@ -1,12 +1,26 @@
 "use client";
 
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useUser } from "@/hooks/useUser";
+import { clearUser } from "@/lib/auth";
+
 const logoMark = "https://www.figma.com/api/mcp/asset/813046f5-6a05-4c55-88ef-71991801e0c3";
+const imgProfile = "https://www.figma.com/api/mcp/asset/868f4c87-5462-4de5-9ea4-945285f86067";
 
 interface HeaderWithModalProps {
   onSignUpClick: () => void;
 }
 
 export default function HeaderWithModal({ onSignUpClick }: HeaderWithModalProps) {
+  const { user, isLoading } = useUser();
+  const [showMenu, setShowMenu] = useState(false);
+
+  const handleLogout = () => {
+    clearUser();
+    setShowMenu(false);
+    window.location.reload();
+  };
 
   return (
     <>
@@ -17,18 +31,46 @@ export default function HeaderWithModal({ onSignUpClick }: HeaderWithModalProps)
         </div>
 
         <nav className="hidden items-center gap-8 lg:flex opacity-90">
-          <a className="text-lg font-semibold text-white/90 hover:text-white transition" href="#">Home</a>
-          <a className="text-lg font-semibold text-white/90 hover:text-white transition" href="#">About</a>
-          <a className="text-lg font-semibold text-white/90 hover:text-white transition" href="#">Features</a>
+          <Link className="text-lg font-semibold text-white/90 hover:text-white transition" href="/">Home</Link>
+          <Link className="text-lg font-semibold text-white/90 hover:text-white transition" href="/about">About</Link>
+          <Link className="text-lg font-semibold text-white/90 hover:text-white transition" href="/wireframe4">Features</Link>
         </nav>
 
-        <button
-          onClick={onSignUpClick}
-          className="inline-flex items-center gap-3 rounded-full bg-[rgba(53,90,26,0.9)] px-4 py-2 shadow-md hover:bg-[rgba(53,90,26,1)] transition text-white"
-        >
-          <span className="text-lg font-medium">Sign Up</span>
-          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 font-bold">›</span>
-        </button>
+        {!isLoading && (
+          user ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.9)] px-4 py-2 shadow-md text-white hover:bg-[rgba(54,90,26,1)] transition"
+              >
+                <span className="text-lg font-medium">{user.name}</span>
+                <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+              </button>
+              
+              {showMenu && (
+                <div className="absolute right-0 mt-2 w-48 rounded-lg bg-white shadow-lg overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <p className="text-sm font-semibold text-gray-800">{user.email || user.name}</p>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-4 py-2 text-left text-sm font-medium text-red-600 hover:bg-gray-100 transition"
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={onSignUpClick}
+              className="inline-flex items-center gap-3 rounded-full bg-[rgba(53,90,26,0.9)] px-4 py-2 shadow-md hover:bg-[rgba(53,90,26,1)] transition text-white"
+            >
+              <span className="text-lg font-medium">Sign Up</span>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-500 font-bold">›</span>
+            </button>
+          )
+        )}
       </div>
     </>
   );

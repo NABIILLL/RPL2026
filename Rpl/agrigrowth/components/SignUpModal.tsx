@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { saveUser } from "@/lib/auth";
 
 const imgGroup2 = "https://www.figma.com/api/mcp/asset/53ed4b6a-3620-47a5-954d-05c77858f9f7";
 
@@ -20,7 +21,10 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Integrate with actual login API
-    router.push("/dashboard");
+    // Save user info to localStorage
+    const userName = email.split("@")[0].replace(/[._]/g, " ");
+    saveUser({ email, name: userName });
+    router.replace("/dashboard");
     onClose();
   };
 
@@ -29,9 +33,9 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute right-12 top-12 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white"
+        className="absolute right-12 top-12 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white text-black text-lg font-bold transition hover:bg-gray-100"
       >
-        ✕
+        x
       </button>
 
       {/* Modal card */}

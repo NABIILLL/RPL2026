@@ -8,6 +8,11 @@ const imgDownload41 = "https://www.figma.com/api/mcp/asset/d97cf4c8-1d28-42b7-b2
 const imgPadiPraktikum = "https://www.figma.com/api/mcp/asset/f5e4867b-98ce-4c79-8726-44f31b684eb1";
 const imgLogo = "https://www.figma.com/api/mcp/asset/7e2c08f9-50c1-4c82-9fb4-6c4e4d40b86f";
 const imgProfile = "https://www.figma.com/api/mcp/asset/10282dce-8830-42b5-a166-2be852d48ad8";
+const imgResultField = "https://www.figma.com/api/mcp/asset/dd4fc15c-fc71-4d42-8ce3-f705b31b9834";
+const imgResultFieldMask = "https://www.figma.com/api/mcp/asset/00b5281f-3cfc-44f9-825b-9a2f16acc168";
+const imgPlantSheaf = "https://www.figma.com/api/mcp/asset/692cc31f-379d-4deb-9cc0-25c87e666058";
+const imgResultLogo = "https://www.figma.com/api/mcp/asset/10cd9835-92fa-4268-9d4f-e336cd4db25d";
+const imgResultProfile = "https://www.figma.com/api/mcp/asset/8abf3696-2490-4f40-96c6-58f8e7a9a696";
 
 const cropCards = [
   {
@@ -31,6 +36,10 @@ export default function Dashboard() {
   const [trackerTitle, setTrackerTitle] = useState("");
   const [isPlantMenuOpen, setIsPlantMenuOpen] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState<string | null>(null);
+  const [showAnalysisForm, setShowAnalysisForm] = useState(false);
+  const [showResultPage, setShowResultPage] = useState(false);
+  const [activeTrackerTitle, setActiveTrackerTitle] = useState("");
+  const [activePlantLabel, setActivePlantLabel] = useState("Padi");
   const userName = "nabil rezon";
 
   const handleCreateTracker = (e: React.FormEvent) => {
@@ -45,10 +54,224 @@ export default function Dashboard() {
 
     // TODO: persist trackerTitle + selectedPlant via API
     console.log("Creating tracker:", trackerTitle, selectedPlant);
-    setTrackerTitle("");
+    setActiveTrackerTitle(trackerTitle);
+    setActivePlantLabel(
+      selectedPlant === "jagung" ? "Jagung" : selectedPlant === "bawang" ? "Bawang Merah" : "Padi",
+    );
+    setShowAnalysisForm(true);
     setSelectedPlant(null);
     setIsPlantMenuOpen(false);
   };
+
+  const handleSaveAnalysis = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: persist analysis data via API
+    console.log("Saving analysis for:", trackerTitle);
+    setShowResultPage(true);
+  };
+
+  if (showResultPage) {
+    return (
+      <main className="min-h-screen bg-[#b8b8b8] text-[#365a1a]">
+        <div className="mx-auto min-h-screen w-full max-w-[1440px] bg-white px-5 pb-10 pt-6 sm:px-10 lg:px-14">
+          <header className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgResultLogo} />
+              <b className="text-[16px] leading-none sm:text-[18px] lg:text-[21px]">Agrigrowth Monitor</b>
+            </div>
+
+            <nav className="hidden items-center gap-10 text-[16px] font-bold lg:flex xl:text-[21px]">
+              <Link href="/dashboard" className="transition hover:opacity-80">
+                Home
+              </Link>
+              <Link href="/about" className="transition hover:opacity-80">
+                About
+              </Link>
+              <Link href="/wireframe4" className="transition hover:opacity-80">
+                Features
+              </Link>
+            </nav>
+
+            <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[14px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[16px] lg:text-[18px]">
+              <span>{userName}</span>
+              <img alt="Profile" className="h-8 w-8 object-contain" src={imgResultProfile} />
+            </div>
+          </header>
+
+          <h1 className="mt-6 text-center text-[32px] font-extrabold leading-tight sm:text-[40px] lg:text-[56px]">
+            Result of ‘{activeTrackerTitle || "Sawah belakang kampus"}’
+          </h1>
+
+          <section className="mt-6 grid gap-4 lg:grid-cols-[383px_1fr] lg:items-start lg:gap-5">
+            <div className="rounded-[28px] border-[3px] border-[rgba(54,90,26,0.75)] p-4 sm:rounded-[35px] sm:p-5">
+              <div className="text-center text-[22px] font-bold sm:text-[26px]">Jenis tanaman</div>
+              <div className="mt-2 flex justify-center">
+                <img alt="Plant icon" className="h-[128px] w-[128px] object-contain sm:h-[140px] sm:w-[140px]" src={imgPlantSheaf} />
+              </div>
+              <div className="text-center text-[22px] font-bold sm:text-[26px]">{activePlantLabel}</div>
+            </div>
+
+            <div className="overflow-hidden rounded-[28px] sm:rounded-[35px]">
+              <img alt="Rice field" className="h-[170px] w-full object-cover sm:h-[190px] lg:h-[212px]" src={imgResultField} />
+            </div>
+          </section>
+
+          <section className="mt-5 rounded-[30px] border-[3px] border-[rgba(54,90,26,0.75)] px-5 py-5 sm:mt-6 sm:px-7 sm:py-6 lg:px-10 lg:py-8">
+            <div className="text-[20px] font-bold sm:text-[24px]">Hari ke : 1</div>
+
+            <div className="mt-4 space-y-5 text-[16px] font-bold leading-tight sm:text-[18px] lg:text-[22px]">
+              <div>
+                <p>1. Pertumbuhan</p>
+                <p>Tinggi :</p>
+                <p>Jumlah daun :</p>
+                <p>Jumlah cabang :</p>
+                <p>Hasil analisa dan rekomendasi :</p>
+              </div>
+
+              <div>
+                <p>2. Kondisi lingkungan</p>
+                <p>pH tanah :</p>
+                <p>cahaya :</p>
+                <p>kondisi tanaman :</p>
+              </div>
+
+              <div>
+                <p>3. Kebutuhan pupuk</p>
+                <p>Jenis pupuk :</p>
+                <p>Luas lahan :</p>
+                <p>Hasil analisa dan rekomendasi</p>
+              </div>
+
+              <div>
+                <p>Review :</p>
+                <p className="max-w-[1170px] font-medium leading-[1.25]">
+                  Pada hari pertama, tanaman anda membutuhkan Lorem ipsum dolor sit amet,
+                  consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.
+                  Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus
+                  mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla
+                  consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec,
+                  vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae,
+                  justo. Nullam dictum felis eu pede mollis pretium. Integer tincidunt. Cras
+                  dapibus. Vivamus elementum semper nisi. Aenean vulputate eleifend tellus.
+                  Aenean leo ligula, porttitor eu, consequat vitae, eleifend ac, enim. Aliquam
+                  lorem ante, dapibus in, viverra quis, feugiat a, tellus. Phasellus viverra nulla
+                  ut metus varius laoreet. Quisque rutrum. Aenean imperdiet. Etiam ultricies nisi
+                  vel augue. Curabitur ullamcorper ultricies
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <Link
+            href="/observation/1"
+            className="mt-6 flex h-[36px] w-full items-center justify-center rounded-full bg-[#365a1a] text-[14px] font-semibold text-white transition hover:bg-[#2d4915] sm:h-[38px] sm:text-[16px] lg:h-[44px] lg:text-[18px]"
+          >
+            Lihat histori pengamatan ini
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  if (showAnalysisForm) {
+    return (
+      <main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
+        <header className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
+          <div className="flex items-center gap-2.5">
+            <img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
+            <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
+          </div>
+
+          <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
+            <Link href="/dashboard" className="border-b-2 border-[#365a1a]">
+              Home
+            </Link>
+            <Link href="/about" className="transition hover:opacity-80">
+              About
+            </Link>
+            <Link href="/wireframe4" className="transition hover:opacity-80">
+              Features
+            </Link>
+          </nav>
+
+          <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
+            <span>{userName}</span>
+            <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+          </div>
+        </header>
+
+        <section className="mx-auto w-full max-w-[1440px] px-5 pb-12 sm:px-10 lg:px-14">
+          <div className="mx-auto w-full max-w-[1280px]">
+            <h1 className="mt-2 text-[32px] font-extrabold leading-[1.08] text-[#365a1a] sm:mt-4 sm:text-[42px] lg:text-[58px]">
+              Start your ‘{activeTrackerTitle || "Sawah belakang kampus"}’ analysist
+            </h1>
+
+            <form onSubmit={handleSaveAnalysis} className="mt-6 space-y-5">
+              <div className="overflow-hidden border border-[#365a1a]">
+                <div className="bg-[#365a1a] px-4 py-2 text-center text-[14px] font-semibold text-white">
+                  Input data hari pengamatan
+                </div>
+                <div className="grid grid-cols-[1fr_170px] gap-px bg-[#365a1a]">
+                  <input
+                    type="text"
+                    placeholder="Hari ke-"
+                    className="h-[38px] bg-white px-4 text-[14px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]"
+                  />
+                  <div className="relative bg-white">
+                    <input
+                      type="text"
+                      defaultValue="1"
+                      className="h-[38px] w-full bg-white px-4 pr-10 text-[14px] text-[#365a1a] outline-none"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#a7b99b]">⌄</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="overflow-hidden border border-[#365a1a]">
+                <div className="bg-[#365a1a] px-4 py-2 text-center text-[14px] font-semibold text-white">
+                  Input data pertumbuhan tanaman
+                </div>
+                <div className="grid grid-cols-1 gap-px bg-[#365a1a] sm:grid-cols-3">
+                  <input type="text" placeholder="Input tinggi tanaman............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input type="text" placeholder="Input jumlah daun............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input type="text" placeholder="Input jumlah cabang............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                </div>
+              </div>
+
+              <div className="overflow-hidden border border-[#365a1a]">
+                <div className="bg-[#365a1a] px-4 py-2 text-center text-[14px] font-semibold text-white">
+                  Input kondisi lingkungan
+                </div>
+                <div className="grid grid-cols-1 gap-px bg-[#365a1a] sm:grid-cols-3">
+                  <input type="text" placeholder="Input pH tanah............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input type="text" placeholder="Input kondisi cahaya............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input type="text" placeholder="Input kondisi tanaman............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                </div>
+              </div>
+
+              <div className="overflow-hidden border border-[#365a1a]">
+                <div className="bg-[#365a1a] px-4 py-2 text-center text-[14px] font-semibold text-white">
+                  Kebutuhan pupuk dengan konversi luas lahan
+                </div>
+                <div className="grid grid-cols-1 gap-px bg-[#365a1a] sm:grid-cols-2">
+                  <input type="text" placeholder="Input Jenis pupuk............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input type="text" placeholder="Input luas lahan............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                className="h-[36px] w-full rounded-full bg-[#365a1a] text-[14px] font-semibold text-white transition hover:bg-[#2d4915]"
+              >
+                Simpan
+              </button>
+            </form>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
@@ -62,9 +285,9 @@ export default function Dashboard() {
           <Link href="/dashboard" className="border-b-2 border-[#365a1a]">
             Home
           </Link>
-          <a href="#" className="transition hover:opacity-80">
+          <Link href="/about" className="transition hover:opacity-80">
             About
-          </a>
+          </Link>
           <Link href="/wireframe4" className="transition hover:opacity-80">
             Features
           </Link>

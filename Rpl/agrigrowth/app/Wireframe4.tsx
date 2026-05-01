@@ -38,7 +38,7 @@ export default function Wireframe4() {
 
 				<nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
 					<Link href="/dashboard" className="hover:opacity-80 transition">Home</Link>
-					<a href="#" className="hover:opacity-80 transition">About</a>
+					<Link href="/about" className="hover:opacity-80 transition">About</Link>
 					<Link href="/wireframe4" className="border-b-2 border-[#365a1a]">Features</Link>
 				</nav>
 
@@ -49,27 +49,35 @@ export default function Wireframe4() {
 			</header>
 
 			<section className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-5 pb-12 pt-6 sm:px-10 lg:px-14 lg:pt-8">
-				{featureCards.map((feature) => (
-					<article
-						key={feature.title}
-						className="rounded-[30px] bg-white p-5 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)] sm:p-6"
-					>
-						<div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
-							<div className="h-[190px] w-full overflow-hidden rounded-[20px] md:h-[273px] md:max-w-[605px]">
-								<img alt={feature.title} className="h-full w-full object-cover" src={feature.image} />
-							</div>
+				{featureCards.map((feature, index) => {
+					const links = ["/features/growth-tracker", "/features/weather", "/features/overviews"];
+					return (
+						<article
+							key={feature.title}
+							className="rounded-[30px] bg-white p-5 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)] sm:p-6 group cursor-pointer hover:shadow-[6px_-6px_25px_0px_rgba(0,0,0,0.3),-6px_6px_25px_0px_rgba(0,0,0,0.3)] transition"
+										>
+							<Link href={links[index]} className="block">
+								<div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
+									<div className="h-[190px] w-full overflow-hidden rounded-[20px] md:h-[273px] md:max-w-[605px] group-hover:opacity-80 transition">
+										<img alt={feature.title} className="h-full w-full object-cover" src={feature.image} />
+									</div>
 
-							<div className="w-full md:max-w-[578px]">
-								<h2 className="text-[42px] font-extrabold leading-[1.05] text-[#365a1a] lg:text-[60px]">
-									{feature.title}
-								</h2>
-								<p className="mt-3 text-[15px] font-medium leading-[1.35] text-[#365a1a] lg:text-[18px]">
-									{feature.description}
-								</p>
-							</div>
-						</div>
-					</article>
-				))}
+									<div className="w-full md:max-w-[578px]">
+										<h2 className="text-[42px] font-extrabold leading-[1.05] text-[#365a1a] lg:text-[60px] group-hover:opacity-80 transition">
+											{feature.title}
+										</h2>
+										<p className="mt-3 text-[15px] font-medium leading-[1.35] text-[#365a1a] lg:text-[18px]">
+											{feature.description}
+										</p>
+										<button className="mt-6 inline-block rounded-full bg-[#365a1a] px-6 py-3 text-[14px] font-semibold text-white transition hover:bg-[#2d4915] group-hover:translate-x-1">
+											Pelajari Lebih Lanjut →
+										</button>
+									</div>
+								</div>
+							</Link>
+						</article>
+					);
+				})}
 			</section>
 		</main>
 	);
