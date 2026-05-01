@@ -33,7 +33,7 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
       {/* Close button */}
       <button
         onClick={onClose}
-        className="absolute right-12 top-12 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white text-black text-lg font-bold transition hover:bg-gray-100"
+        className="absolute right-12 top-12 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-white text-black text-lg font-bold transition hover:bg-gray-50"
       >
         x
       </button>
