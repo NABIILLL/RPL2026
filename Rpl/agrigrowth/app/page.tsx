@@ -6,16 +6,17 @@ const logoMark =
   "https://www.figma.com/api/mcp/asset/813046f5-6a05-4c55-88ef-71991801e0c3";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import HeaderWithModal from "@/components/HeaderWithModal";
-import SignUpModal from "@/components/SignUpModal";
+import AuthModal from "@/components/AuthModal";
 import { useUser } from "@/hooks/useUser";
-
 
 const navItems = ["Home", "About", "Features"];
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user, isLoading } = useUser();
+  const router = useRouter();
 
   // Auto-open modal jika user belum login
   useEffect(() => {
@@ -23,9 +24,18 @@ export default function Home() {
       setIsModalOpen(true);
     }
   }, [user, isLoading]);
+
+  const handleGetStarted = () => {
+    if (user) {
+      router.push("/dashboard");
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#081018] text-white">
-      <SignUpModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       <div
         aria-hidden
         className="absolute inset-0"
@@ -53,7 +63,7 @@ export default function Home() {
           </p>
 
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleGetStarted}
             className="mt-10 inline-flex items-center gap-3 rounded-full bg-white px-6 py-3 text-base font-semibold text-black shadow-lg transition duration-200 hover:bg-gray-100 hover:shadow-xl sm:gap-4 sm:px-8 sm:py-4 sm:text-lg"
             type="button"
           >

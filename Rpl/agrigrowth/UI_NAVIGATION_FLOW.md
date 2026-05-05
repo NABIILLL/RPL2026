@@ -1,0 +1,423 @@
+# AgriGrowth UI Navigation Flow
+
+## 1. User Authentication Flow
+
+```
+┌─────────────────────────────────┐
+│   Landing Page / Login Page     │
+│   - Login form                  │
+│   - Signup link                 │
+│   - Forgot password link        │
+└────────────┬────────────────────┘
+             │
+             ├──[Valid Credentials]──┐
+             │                       │
+             ├──[New User]──────┐    │
+             │                  │    │
+             ▼                  ▼    ▼
+        ┌─────────────┐   ┌──────────────────┐
+        │   Sign Up   │   │  Dashboard      │
+        │   - Email   │   │  (Main App)     │
+        │   - Password│   └──────────────────┘
+        │   - Details │
+        └──────┬──────┘
+               │
+               ▼
+          ┌──────────────────┐
+          │  Verify Email    │
+          │  (OTP / Link)    │
+          └────────┬─────────┘
+                   │
+                   ▼
+          ┌──────────────────┐
+          │   Dashboard      │
+          │   (Main App)     │
+          └──────────────────┘
+```
+
+## 2. User Dashboard Navigation Flow
+
+```
+                    ┌────────────────────────────┐
+                    │    Dashboard               │
+                    │ (View summary & quick link)│
+                    └────────┬───────────────────┘
+                             │
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+        ▼                    ▼                    ▼
+  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+  │ Data Tanaman │    │ Input Data   │    │  Monitoring  │
+  │ Management   │    │ Pertumbuhan  │    │  Grafik      │
+  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘
+         │                   │                   │
+         ├─[View]           ├─[View]            └─[View Charts]
+         ├─[Add]            ├─[Add New]            │
+         ├─[Edit]           └─[Edit Entry]        ├─[Filter Period]
+         └─[Delete]                              ├─[Export Data]
+                                                  └─[Full Analysis]
+                    
+        ┌────────────────────┼────────────────────┐
+        │                    │                    │
+        ▼                    ▼                    ▼
+  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐
+  │ Prediksi     │    │ Deteksi      │    │ Informasi    │
+  │ Panen        │    │ Penyakit     │    │ Cuaca        │
+  └──────┬───────┘    └──────┬───────┘    └──────┬───────┘
+         │                   │                   │
+         ├─[View Prediction] │                   │
+         ├─[See Timeline]    ├─[Input Symptoms] │
+         └─[Get Tips]        │                   │
+                             ├─[View Results]    ├─[View Current]
+                             ├─[Get Treatment]   ├─[See Forecast]
+                             └─[Save Report]     └─[Get Alerts]
+```
+
+## 3. Data Tanaman (Plant Management) Flow
+
+```
+    Dashboard
+         │
+         ▼
+  ┌─────────────────────────────────┐
+  │ Plant Data Dashboard             │
+  │ - List semua tanaman             │
+  │ - Quick add button               │
+  └────────────┬──────────────────────┘
+               │
+       ┌───────┼───────────┐
+       │       │           │
+    [Add]   [Edit]      [Delete]
+       │       │           │
+       ▼       ▼           ▼
+   ┌────┐  ┌─────┐    ┌─────────┐
+   │    │  │     │    │ Confirm │
+   │    │  │     │    │ Delete  │
+   └─┬──┘  └──┬──┘    └────┬────┘
+     │       │             │
+     └───┬───┴─────┬───────┘
+         │         │
+         ▼         ▼
+    ┌─────────────────────────┐
+    │ Form Modal              │
+    │ - Select crop type      │
+    │ - Enter variety         │
+    │ - Set location          │
+    │ - Plant date            │
+    │ - Land area             │
+    └────────┬────────────────┘
+             │
+         [Validate]
+             │
+         ┌───┴────┐
+         │        │
+       Error   Success
+         │        │
+         ▼        ▼
+    [Show]   [Save to DB]
+    Error        │
+    Msg      [Return to List]
+```
+
+## 4. Input Data Pertumbuhan Flow
+
+```
+    Dashboard
+         │
+         ▼
+  ┌──────────────────────────┐
+  │ Select Plant             │
+  │ [Dropdown: Padi - IR64] ◀─┐
+  └────────┬─────────────────┘ │
+           │                   │
+        [Select]               │
+           │                   │
+           ▼                   │
+  ┌──────────────────────────┐ │
+  │ Select Growth Phase       │ │
+  │ [Vegetative/Generative]   │ │
+  └────────┬─────────────────┘ │
+           │                   │
+        [Select]               │
+           │                   │
+           ▼                   │
+  ┌──────────────────────────┐ │
+  │ Input Growth Data Form    │ │
+  │ - Observation date        │ │
+  │ - Plant height            │ │
+  │ - Leaf count              │ │
+  │ - Branch count            │ │
+  │ - Stem diameter           │ │
+  │ - Remarks                 │ │
+  └────────┬─────────────────┘ │
+           │                   │
+      [Validate]               │
+           │                   │
+       ┌───┴────┐              │
+       │        │              │
+     Error   Success           │
+       │        │              │
+       ▼        ▼              │
+   [Show]   [Save to DB]       │
+   Error        │              │
+   Msg     ┌────┴─────┐        │
+           │          │        │
+        [Success   [Add More]──┘
+         Dialog]   [Return]
+           │          │
+           └──┬───────┘
+              │
+              ▼
+         [Dashboard]
+```
+
+## 5. Monitoring Grafik Flow
+
+```
+    Dashboard
+         │
+         ▼
+  ┌──────────────────────────┐
+  │ Monitoring Dashboard     │
+  │ - Plant selector         │
+  │ - Period filter          │
+  └────────┬─────────────────┘
+           │
+      [Fetch Data]
+           │
+           ▼
+  ┌──────────────────────────┐
+  │ Data Analysis            │
+  │ - Aggregate growth data  │
+  │ - Calculate trends       │
+  │ - Prepare for charts     │
+  └────────┬─────────────────┘
+           │
+           ▼
+  ┌──────────────────────────┐
+  │ Render Charts            │
+  │ - Height growth line     │
+  │ - Leaf count line        │
+  │ - Branch growth line     │
+  │ - Stem diameter          │
+  └────────┬─────────────────┘
+           │
+       [Options]
+         ├─ [Export PDF]
+         ├─ [Share Report]
+         ├─ [Detailed Analysis]
+         └─ [Back]
+```
+
+## 6. Prediksi Panen Flow
+
+```
+    Dashboard
+         │
+         ▼
+  ┌──────────────────────────┐
+  │ Prediksi Panen Page      │
+  │ - Select plant           │
+  └────────┬─────────────────┘
+           │
+      [Calculate]
+           │
+           ▼
+  ┌──────────────────────────┐
+  │ Prediction Analysis      │
+  │ - Growth trend analysis  │
+  │ - Phase progression calc │
+  │ - ML prediction algo     │
+  └────────┬─────────────────┘
+           │
+           ▼
+  ┌──────────────────────────┐
+  │ Display Results          │
+  │ - Harvest date estimate  │
+  │ - Expected yield         │
+  │ - Confidence level       │
+  │ - Recommendations        │
+  │ - Confidence warnings    │
+  └────────┬─────────────────┘
+           │
+       [Options]
+         ├─ [View Details]
+         ├─ [Save Report]
+         ├─ [Share]
+         └─ [Back]
+```
+
+## 7. Deteksi Penyakit Flow
+
+```
+    Dashboard
+         │
+         ▼
+  ┌──────────────────────────┐
+  │ Disease Detection Page   │
+  │ - Select plant           │
+  └────────┬─────────────────┘
+           │
+           ▼
+  ┌──────────────────────────┐
+  │ Symptom Input Form       │
+  │ - Checkboxes for symptoms│
+  │ - Upload photo (optional)│
+  │ - Severity level         │
+  │ - Additional notes       │
+  └────────┬─────────────────┘
+           │
+      [Analyze]
+           │
+           ▼
+  ┌──────────────────────────┐
+  │ Disease Detection Engine │
+  │ - Match symptoms to DB   │
+  │ - Apply ML model         │
+  │ - Rank probabilities     │
+  └────────┬─────────────────┘
+           │
+           ▼
+  ┌──────────────────────────┐
+  │ Display Results          │
+  │ - Top 3 possible diseases│
+  │ - Treatment options      │
+  │ - Prevention tips        │
+  │ - Severity warning       │
+  │ - When to consult expert │
+  └────────┬─────────────────┘
+           │
+       [Options]
+         ├─ [Save Report]
+         ├─ [Consult Expert]
+         ├─ [Get More Info]
+         └─ [Back]
+```
+
+## 8. Informasi Cuaca Flow
+
+```
+    Dashboard
+         │
+         ▼
+  ┌──────────────────────────┐
+  │ Weather Page             │
+  │ - Show location          │
+  │ - Change location option │
+  └────────┬─────────────────┘
+           │
+      [API Call]
+           │
+           ▼
+  ┌──────────────────────────┐
+  │ Fetch Weather Data       │
+  │ - Current weather (BMKG) │
+  │ - 7-day forecast         │
+  │ - UV index, wind, etc    │
+  └────────┬─────────────────┘
+           │
+           ▼
+  ┌──────────────────────────┐
+  │ Display Weather          │
+  │ - Current conditions     │
+  │ - Forecast cards         │
+  │ - Agricultural impacts   │
+  │ - Risk alerts            │
+  └────────┬─────────────────┘
+           │
+       [Options]
+         ├─ [Change Location]
+         ├─ [Set Alerts]
+         ├─ [Detailed Forecast]
+         └─ [Back]
+```
+
+## 9. Admin - Kelola Pengguna Flow
+
+```
+    Dashboard (Admin View)
+         │
+         ▼
+  ┌──────────────────────────┐
+  │ User Management          │
+  │ - User list/table        │
+  │ - Search & filter        │
+  │ - Add user button        │
+  └────────┬─────────────────┘
+           │
+      ┌────┼────┐
+      │    │    │
+   [Add] [Edit] [Delete]
+      │    │    │
+      ▼    ▼    ▼
+   ┌──────────────────────────┐
+   │ User Action Modal        │
+   │ - User details form      │
+   │ - Role assignment        │
+   │ - Status toggle          │
+   │ - Password reset option  │
+   └────────┬─────────────────┘
+            │
+       [Validate & Save]
+            │
+            ▼
+   ┌──────────────────────────┐
+   │ Success Message          │
+   │ + Send notification      │
+   │ - Update user list       │
+   └────────┬─────────────────┘
+            │
+        [Return to List]
+```
+
+## 10. Complete Navigation Map
+
+```
+                           ┌──────────────────┐
+                           │    Dashboard     │
+                           └────────┬─────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    │               │               │
+            ┌───────▼─────────┐  ┌──▼────────────┐  ┌──▼──────────────┐
+            │ Data Tanaman    │  │ Input Growth  │  │ Monitoring      │
+            │ Management      │  │ Data          │  │ Grafik          │
+            └────────┬────────┘  └──┬────────────┘  └──┬──────────────┘
+                     │               │                  │
+        ┌────────────┼──────────┐    │         ┌────────┴────────┐
+        │            │         │    │         │                 │
+    [Add] [Edit]  [Delete]     │    │    [Export]  [Analyze]
+        │            │         │    │         │
+        ▼            ▼         ▼    ▼         ▼
+     ┌───────┐  ┌───────┐  ┌─────┐  │  ┌──────────────┐
+     │ Modal │  │ Modal │  │ Conf│  │  │  Detail View │
+     │ Form  │  │ Form  │  │irmation  │  └──────────────┘
+     └───────┘  └───────┘  └─────┘  │
+                                     └──┐
+                     ┌───────────────────┼───────────────────┐
+                     │                   │                   │
+            ┌────────▼─────────┐  ┌──────▼────────┐  ┌──────▼──────────┐
+            │ Prediksi Panen   │  │ Deteksi       │  │ Informasi       │
+            │                  │  │ Penyakit      │  │ Cuaca           │
+            └────────┬─────────┘  └──┬────────────┘  └──┬──────────────┘
+                     │               │                  │
+                  [Save] [Share]  [Save] [Consult]  [Change] [Alerts]
+                     │               │                  │
+                     └───────────────┼──────────────────┘
+                                     │
+                                (Admin Only)
+                                     │
+                            ┌────────▼──────────┐
+                            │ Kelola Pengguna   │
+                            │ (User Management) │
+                            └───────────────────┘
+                                     │
+                    ┌────────────────┼────────────────┐
+                    │                │                │
+              [Add User]        [Edit User]    [Delete User]
+                    │                │                │
+                    └────────────────┴────────────────┘
+                                 │
+                        [Return to User List]
+```
+

@@ -4,14 +4,16 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 
-const imgGroup2 = "https://www.figma.com/api/mcp/asset/53ed4b6a-3620-47a5-954d-05c77858f9f7";
+// Public fallback images (replace with local `/public/images/...` for production)
+const imgGroup2 = "https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=1200&q=80";
 
 // Mock data - in production, this would come from an API
 const observationData = {
-  "1": {
+    "1": {
     cropName: "Jagung",
     day: 1,
-    imageUrl: "https://www.figma.com/api/mcp/asset/2d7af9f5-776e-41f7-851d-32ef06f4449b",
+      // Use a public image; replace with `/images/observation-1.jpg` in /public for offline/local use
+      imageUrl: "https://images.unsplash.com/photo-1574943320219-553eb213f72d?auto=format&fit=crop&w=1400&q=80",
     growth: {
       height: "25 cm",
       leaves: "6 helai",

@@ -1,6 +1,9 @@
+/// <reference types="react" />
+
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { saveUser } from "@/lib/auth";
 
 const imgGroup2 = "https://www.figma.com/api/mcp/asset/53ed4b6a-3620-47a5-954d-05c77858f9f7";
@@ -13,6 +16,7 @@ interface SignUpModalProps {
 export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
   const [email, setEmail] = useState("nabilrezonicalmira@apps.ipb.ac.id");
   const [password, setPassword] = useState("xxxxxxxxxx");
+  const router = useRouter();
 
   if (!isOpen) return null;
 
@@ -22,7 +26,7 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
     // Save user info to localStorage
     const userName = email.split("@")[0].replace(/[._]/g, " ");
     saveUser({ email, name: userName });
-    window.location.href = "/dashboard";
+    router.replace("/dashboard");
     onClose();
   };
 

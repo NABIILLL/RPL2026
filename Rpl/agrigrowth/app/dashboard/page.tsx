@@ -308,16 +308,17 @@ export default function Dashboard() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-[30px]">
             {cropCards.map((card) => (
-              <article
+              <Link
                 key={card.id}
-                className="relative h-[360px] overflow-hidden rounded-[16px] shadow-[-6px_6px_12px_rgba(0,0,0,0.3)] sm:h-[396px]"
+                href={`/observation/${card.id}/history`}
+                className="group relative h-[360px] overflow-hidden rounded-[16px] shadow-[-6px_6px_12px_rgba(0,0,0,0.3)] transition hover:shadow-[-6px_6px_20px_rgba(0,0,0,0.5)] sm:h-[396px]"
               >
-                <img alt={card.title} className="h-full w-full object-cover" src={card.image} />
-                <div className="absolute inset-x-0 bottom-0 h-[32%] bg-gradient-to-t from-[#365a1a] to-transparent" />
-                <p className="absolute inset-x-0 bottom-3 text-center text-[18px] font-extrabold text-white">
+                <img alt={card.title} className="h-full w-full object-cover transition group-hover:scale-105" src={card.image} />
+                <div className="absolute inset-x-0 bottom-0 h-[32%] bg-gradient-to-t from-[#365a1a] to-transparent transition group-hover:h-[40%]" />
+                <p className="absolute inset-x-0 bottom-3 text-center text-[18px] font-extrabold text-white transition group-hover:bottom-4">
                   {card.title}
                 </p>
-              </article>
+              </Link>
             ))}
           </div>
         </div>
