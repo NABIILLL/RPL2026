@@ -119,7 +119,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const handleSignUpPhoneData = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Save phone signup data
-    saveUser({ name, email, phone, role });
+    saveUser({ name, email, role });
     handleAuthSuccess();
   };
 
@@ -153,7 +153,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const handleLoginPhoneVerify = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Verify phone code
-    saveUser({ phone, name: phone });
+    saveUser({ name: phone, email: "" });
     handleAuthSuccess();
   };
 
@@ -165,15 +165,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const handleBack = () => {
     if (step === "choice") {
       onClose();
-    } else if (
-      step === "signup-method" ||
-      step === "login-method"
-    ) {
-      setStep("choice");
     } else if (step.includes("signup")) {
-      setStep("signup-method");
+      setStep("choice");
     } else if (step.includes("login")) {
-      setStep("login-method");
+      setStep("choice");
     }
   };
 
@@ -210,7 +205,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <button
               onClick={() => {
                 setAuthMode("signup");
-                setStep("signup-method");
+                setStep("signup-email");
               }}
               className="w-full rounded-[15px] border-2 border-black bg-transparent py-[18px] font-['Plus_Jakarta_Sans:Bold'] text-[16px] font-bold text-black transition hover:bg-black/5"
             >
@@ -220,7 +215,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             <button
               onClick={() => {
                 setAuthMode("login");
-                setStep("login-method");
+                setStep("login-email");
               }}
               className="w-full rounded-[15px] bg-black py-[18px] font-['Plus_Jakarta_Sans:Bold'] text-[16px] font-bold text-white transition hover:bg-black/80"
             >

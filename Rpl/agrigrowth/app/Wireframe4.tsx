@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getUser, clearUser } from "@/lib/auth";
+import { clearUser } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { useUser } from "@/hooks/useUser";
+import AuthModal from "@/components/AuthModal";
 
 const imgComplementary3 = "https://www.figma.com/api/mcp/asset/0f007e12-4c18-46b6-ad68-a156ab1be51b";
 const imgWallpaperDelDia1 = "https://www.figma.com/api/mcp/asset/6d79e7b3-a514-42ab-9341-11e7bb3be8e1";
@@ -34,15 +36,9 @@ const featureCards = [
 ];
 
 export default function Wireframe4() {
-	const [userName, setUserName] = useState("Guest");
+	const { user, isLoading } = useUser();
+	const [isModalOpen, setIsModalOpen] = useState(false);
 	const router = useRouter();
-
-	useEffect(() => {
-		const user = getUser();
-		if (user && user.name) {
-			setUserName(user.name);
-		}
-	}, []);
 
 	const handleLogout = async () => {
 		try {
@@ -56,6 +52,7 @@ export default function Wireframe4() {
 
 	return (
 		<main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
+			<AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 			<header className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
 				<div className="flex items-center gap-2.5">
 					<img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
@@ -63,23 +60,34 @@ export default function Wireframe4() {
 				</div>
 
 				<nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
-					<Link href="/dashboard" className="hover:opacity-80 transition">Home</Link>
+					<Link href={user ? "/dashboard" : "/"} className="hover:opacity-80 transition">Home</Link>
 					<Link href="/about" className="hover:opacity-80 transition">About</Link>
 					<Link href="/wireframe4" className="border-b-2 border-[#365a1a]">Features</Link>
 				</nav>
 
-				<div className="flex items-center gap-4">
-					<div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
-						<span>{userName}</span>
-						<img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
-					</div>
-					<button 
-						onClick={handleLogout}
-						className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
-					>
-						Logout
-					</button>
-				</div>
+				{!isLoading && (
+					user ? (
+						<div className="flex items-center gap-4">
+							<div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
+								<span>{user.name}</span>
+								<img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+							</div>
+							<button 
+								onClick={handleLogout}
+								className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
+							>
+								Logout
+							</button>
+						</div>
+					) : (
+						<button 
+							onClick={() => setIsModalOpen(true)} 
+							className="rounded-full bg-[#365a1a] px-5 py-2 text-[16px] font-medium text-white shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px] hover:bg-[#2d4915] transition"
+						>
+							Login / Sign Up
+						</button>
+					)
+				)}
 			</header>
 
 			<section className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-5 pb-12 pt-6 sm:px-10 lg:px-14 lg:pt-8">
@@ -89,8 +97,19 @@ export default function Wireframe4() {
 						<article
 							key={feature.title}
 							className="rounded-[30px] bg-white p-5 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)] sm:p-6 group cursor-pointer hover:shadow-[6px_-6px_25px_0px_rgba(0,0,0,0.3),-6px_6px_25px_0px_rgba(0,0,0,0.3)] transition"
-										>
-							<Link href={links[index]} className="block">
+							onClick={(e) => {
+								if (!user) {
+									e.preventDefault();
+									setIsModalOpen(true);
+								}
+							}}
+						>
+							<Link href={user ? links[index] : "#"} className="block" onClick={(e) => {
+								if (!user) {
+									e.preventDefault();
+									setIsModalOpen(true);
+								}
+							}}>
 								<div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
 									<div className="h-[190px] w-full overflow-hidden rounded-[20px] md:h-[273px] md:max-w-[605px] group-hover:opacity-80 transition">
 										<img alt={feature.title} className="h-full w-full object-cover" src={feature.image} />

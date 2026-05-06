@@ -21,17 +21,17 @@ const imgResultProfile = "https://www.figma.com/api/mcp/asset/8abf3696-2490-4f40
 const cropCards = [
   {
     id: 1,
-    title: "Sawah belakang kampus",
+    title: "Padi",
     image: imgRice2,
   },
   {
     id: 2,
-    title: "Jagung rezon",
+    title: "Jagung",
     image: imgDownload41,
   },
   {
     id: 3,
-    title: "Padi praktikum",
+    title: "Bawang",
     image: imgPadiPraktikum,
   },
 ];
@@ -41,7 +41,7 @@ export default function Dashboard() {
   const [isPlantMenuOpen, setIsPlantMenuOpen] = useState(false);
   const [selectedPlant, setSelectedPlant] = useState<string | null>(null);
   const [showAnalysisForm, setShowAnalysisForm] = useState(false);
-  const [showResultPage, setShowResultPage] = useState(false);
+  const [latestLog, setLatestLog] = useState<any>(null);
   const [activeTrackerTitle, setActiveTrackerTitle] = useState("");
   const [activeTrackerId, setActiveTrackerId] = useState<string | null>(null);
   const [activePlantLabel, setActivePlantLabel] = useState("Padi");
@@ -74,7 +74,7 @@ export default function Dashboard() {
 
   const handleContinue = async () => {
     if (!selectedPlant) return;
-    
+
     const user = getUser();
     if (!user || !user.id) {
       toast.error("Anda harus login untuk membuat tracker.");
@@ -93,7 +93,7 @@ export default function Dashboard() {
         .single();
 
       if (error) throw error;
-      
+
       setActiveTrackerId(data.id);
       setActiveTrackerTitle(trackerTitle);
       setActivePlantLabel(
@@ -180,9 +180,9 @@ export default function Dashboard() {
     try {
       const { error } = await supabase.from("growth_logs").insert(logData);
       if (error) throw error;
-      
+
       toast.success("Data pengamatan berhasil disimpan!");
-      setShowResultPage(true);
+      setLatestLog(logData);
     } catch (err: any) {
       console.error(err);
       // Ganti pesan error Supabase dengan pesan yang lebih ramah pengguna
@@ -196,7 +196,7 @@ export default function Dashboard() {
     }
   };
 
-  if (showResultPage) {
+  if (latestLog) {
     return (
       <main className="min-h-screen bg-[#b8b8b8] text-[#365a1a]">
         <div className="mx-auto min-h-screen w-full max-w-[1440px] bg-white px-5 pb-10 pt-6 sm:px-10 lg:px-14">
@@ -223,7 +223,7 @@ export default function Dashboard() {
                 <span>{userName}</span>
                 <img alt="Profile" className="h-8 w-8 object-contain" src={imgResultProfile} />
               </div>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
               >
@@ -251,29 +251,35 @@ export default function Dashboard() {
           </section>
 
           <section className="mt-5 rounded-[30px] border-[3px] border-[rgba(54,90,26,0.75)] px-5 py-5 sm:mt-6 sm:px-7 sm:py-6 lg:px-10 lg:py-8">
-            <div className="text-[20px] font-bold sm:text-[24px]">Hari ke : 1</div>
+            <div className="text-[20px] font-bold sm:text-[24px]">Hari ke : {latestLog.day_number}</div>
 
             <div className="mt-4 space-y-5 text-[16px] font-bold leading-tight sm:text-[18px] lg:text-[22px]">
               <div>
-                <p>1. Pertumbuhan</p>
-                <p>Tinggi :</p>
-                <p>Jumlah daun :</p>
-                <p>Jumlah cabang :</p>
-                <p>Hasil analisa dan rekomendasi :</p>
+                <p className="text-[#365a1a]">1. Pertumbuhan</p>
+                <div className="ml-4 space-y-1 font-medium text-[15px] sm:text-[17px] text-[#365a1a]/90">
+                  <p>Tinggi : {latestLog.plant_height} cm</p>
+                  <p>Jumlah daun : {latestLog.leaf_count} helai</p>
+                  <p>Jumlah cabang : {latestLog.branch_count}</p>
+                  <p>Hasil analisa dan rekomendasi : Pertumbuhan optimal dan sesuai harapan.</p>
+                </div>
               </div>
 
               <div>
-                <p>2. Kondisi lingkungan</p>
-                <p>pH tanah :</p>
-                <p>cahaya :</p>
-                <p>kondisi tanaman :</p>
+                <p className="text-[#365a1a]">2. Kondisi lingkungan</p>
+                <div className="ml-4 space-y-1 font-medium text-[15px] sm:text-[17px] text-[#365a1a]/90">
+                  <p>pH tanah : {latestLog.soil_ph}</p>
+                  <p>Cahaya : {latestLog.light_condition}</p>
+                  <p>Kondisi tanaman : {latestLog.plant_condition}</p>
+                </div>
               </div>
 
               <div>
-                <p>3. Kebutuhan pupuk</p>
-                <p>Jenis pupuk :</p>
-                <p>Luas lahan :</p>
-                <p>Hasil analisa dan rekomendasi</p>
+                <p className="text-[#365a1a]">3. Kebutuhan pupuk</p>
+                <div className="ml-4 space-y-1 font-medium text-[15px] sm:text-[17px] text-[#365a1a]/90">
+                  <p>Jenis pupuk : {latestLog.fertilizer_type}</p>
+                  <p>Luas lahan : {latestLog.land_area} m²</p>
+                  <p>Hasil analisa dan rekomendasi : Pemberian pupuk cukup untuk luas lahan tersebut.</p>
+                </div>
               </div>
 
               <div>
@@ -297,7 +303,7 @@ export default function Dashboard() {
           </section>
 
           <Link
-            href="/observation/1"
+            href={`/observation/${activePlantLabel === "Bawang Merah" ? "bawang" : activePlantLabel.toLowerCase()}/history`}
             className="mt-6 flex h-[36px] w-full items-center justify-center rounded-full bg-[#365a1a] text-[14px] font-semibold text-white transition hover:bg-[#2d4915] sm:h-[38px] sm:text-[16px] lg:h-[44px] lg:text-[18px]"
           >
             Lihat histori pengamatan ini
@@ -333,7 +339,7 @@ export default function Dashboard() {
               <span>{userName}</span>
               <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
             </div>
-            <button 
+            <button
               onClick={handleLogout}
               className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
             >
@@ -376,9 +382,9 @@ export default function Dashboard() {
                   Input data pertumbuhan tanaman
                 </div>
                 <div className="grid grid-cols-1 gap-px bg-[#365a1a] sm:grid-cols-3">
-                  <input name="plant_height" type="text" placeholder="Input tinggi tanaman............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
-                  <input name="leaf_count" type="text" placeholder="Input jumlah daun............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
-                  <input name="branch_count" type="text" placeholder="Input jumlah cabang............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="plant_height" type="text" required placeholder="Input tinggi tanaman............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="leaf_count" type="text" required placeholder="Input jumlah daun............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="branch_count" type="text" required placeholder="Input jumlah cabang............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
                 </div>
               </div>
 
@@ -387,9 +393,9 @@ export default function Dashboard() {
                   Input kondisi lingkungan
                 </div>
                 <div className="grid grid-cols-1 gap-px bg-[#365a1a] sm:grid-cols-3">
-                  <input name="soil_ph" type="text" placeholder="Input pH tanah............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
-                  <input name="light_condition" type="text" placeholder="Input kondisi cahaya............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
-                  <input name="plant_condition" type="text" placeholder="Input kondisi tanaman............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="soil_ph" type="text" required placeholder="Input pH tanah............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="light_condition" type="text" required placeholder="Input kondisi cahaya............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="plant_condition" type="text" required placeholder="Input kondisi tanaman............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
                 </div>
               </div>
 
@@ -398,8 +404,8 @@ export default function Dashboard() {
                   Kebutuhan pupuk dengan konversi luas lahan
                 </div>
                 <div className="grid grid-cols-1 gap-px bg-[#365a1a] sm:grid-cols-2">
-                  <input name="fertilizer_type" type="text" placeholder="Input Jenis pupuk............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
-                  <input name="land_area" type="text" placeholder="Input luas lahan............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="fertilizer_type" type="text" required placeholder="Input Jenis pupuk............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="land_area" type="text" required placeholder="Input luas lahan............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
                 </div>
               </div>
 
@@ -441,7 +447,7 @@ export default function Dashboard() {
             <span>{userName}</span>
             <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
           </div>
-          <button 
+          <button
             onClick={handleLogout}
             className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
           >

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useWeather } from "@/hooks/useWeather";
 import { getWeatherEmoji } from "@/lib/weather";
+import { useUser } from "@/hooks/useUser";
 
 const imgWeatherImage = "https://www.figma.com/api/mcp/asset/6d79e7b3-a514-42ab-9341-11e7bb3be8e1";
 const imgLogo = "https://www.figma.com/api/mcp/asset/90530aab-9c02-498f-97a0-e57018497d3e";
@@ -15,6 +16,7 @@ const DEFAULT_LON = 106.8063;
 const DEFAULT_LOCATION = "Bogor, Jawa Barat";
 
 export default function WeatherInfo() {
+  const { user, isLoading } = useUser();
   const [latitude, setLatitude] = useState(DEFAULT_LAT);
   const [longitude, setLongitude] = useState(DEFAULT_LON);
   const [locationName, setLocationName] = useState(DEFAULT_LOCATION);
@@ -89,7 +91,7 @@ export default function WeatherInfo() {
         </nav>
 
         <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
-          <span>nabil rezon</span>
+          <span>{!isLoading && user ? user.name : "Guest"}</span>
           <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
         </div>
       </header>

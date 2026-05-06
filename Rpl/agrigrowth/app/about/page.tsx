@@ -5,11 +5,29 @@ import Link from "next/link";
 const imgLogo = "https://www.figma.com/api/mcp/asset/291a570e-3898-477c-a806-4a2ec45e4d6f";
 const imgProfile = "https://www.figma.com/api/mcp/asset/868f4c87-5462-4de5-9ea4-945285f86067";
 
+import { useUser } from "@/hooks/useUser";
+import AuthModal from "@/components/AuthModal";
+import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+import { clearUser } from "@/lib/auth";
+
 export default function About() {
-  const userName = "nabil rezon";
+  const { user, isLoading } = useUser();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      clearUser();
+      window.location.reload();
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-white text-[#365a1a]">
+      <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       {/* Header */}
       <header className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
         <div className="flex items-center gap-2.5">
@@ -18,7 +36,7 @@ export default function About() {
         </div>
 
         <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
-          <Link href="/dashboard" className="transition hover:opacity-80">
+          <Link href={user ? "/dashboard" : "/"} className="transition hover:opacity-80">
             Home
           </Link>
           <Link href="/about" className="border-b-2 border-[#365a1a]">
@@ -29,10 +47,23 @@ export default function About() {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
-          <span>{userName}</span>
-          <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
-        </div>
+        {!isLoading && (
+          user ? (
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
+                <span>{user.name}</span>
+                <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+              </div>
+              <button onClick={handleLogout} className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
+                Logout
+              </button>
+            </div>
+          ) : (
+            <button onClick={() => setIsModalOpen(true)} className="rounded-full bg-[#365a1a] px-5 py-2 text-[16px] font-medium text-white shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px] hover:bg-[#2d4915] transition">
+              Login / Sign Up
+            </button>
+          )
+        )}
       </header>
 
       {/* Content */}

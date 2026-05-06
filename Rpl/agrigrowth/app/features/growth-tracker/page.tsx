@@ -1,12 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useUser } from "@/hooks/useUser";
 
 const imgGrowthTrackerImage = "https://www.figma.com/api/mcp/asset/0f007e12-4c18-46b6-ad68-a156ab1be51b";
 const imgLogo = "https://www.figma.com/api/mcp/asset/90530aab-9c02-498f-97a0-e57018497d3e";
 const imgProfile = "https://www.figma.com/api/mcp/asset/03caec6e-0209-4de6-a510-5e7ebeb6fffd";
 
 export default function GrowthTracker() {
+  const { user, isLoading } = useUser();
   return (
     <main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
       {/* Header */}
@@ -29,7 +31,7 @@ export default function GrowthTracker() {
         </nav>
 
         <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
-          <span>nabil rezon</span>
+          <span>{!isLoading && user ? user.name : "Guest"}</span>
           <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
         </div>
       </header>
