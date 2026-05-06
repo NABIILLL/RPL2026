@@ -16,7 +16,13 @@ export default function HeaderWithModal({ onSignUpClick }: HeaderWithModalProps)
   const { user, isLoading } = useUser();
   const [showMenu, setShowMenu] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      const { supabase } = await import("@/lib/supabase");
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
     clearUser();
     setShowMenu(false);
     window.location.reload();
