@@ -1,4 +1,10 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getUser, clearUser } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 
 const imgComplementary3 = "https://www.figma.com/api/mcp/asset/0f007e12-4c18-46b6-ad68-a156ab1be51b";
 const imgWallpaperDelDia1 = "https://www.figma.com/api/mcp/asset/6d79e7b3-a514-42ab-9341-11e7bb3be8e1";
@@ -28,6 +34,26 @@ const featureCards = [
 ];
 
 export default function Wireframe4() {
+	const [userName, setUserName] = useState("Guest");
+	const router = useRouter();
+
+	useEffect(() => {
+		const user = getUser();
+		if (user && user.name) {
+			setUserName(user.name);
+		}
+	}, []);
+
+	const handleLogout = async () => {
+		try {
+			await supabase.auth.signOut();
+			clearUser();
+			router.push("/");
+		} catch (error) {
+			console.error("Failed to logout:", error);
+		}
+	};
+
 	return (
 		<main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
 			<header className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
@@ -42,9 +68,17 @@ export default function Wireframe4() {
 					<Link href="/wireframe4" className="border-b-2 border-[#365a1a]">Features</Link>
 				</nav>
 
-				<div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
-					<span>nabil rezon</span>
-					<img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+				<div className="flex items-center gap-4">
+					<div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
+						<span>{userName}</span>
+						<img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+					</div>
+					<button 
+						onClick={handleLogout}
+						className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
+					>
+						Logout
+					</button>
 				</div>
 			</header>
 

@@ -2,6 +2,7 @@ interface User {
   name: string;
   email: string;
   id?: string;
+  role?: string;
 }
 
 export function saveUser(user: User): void {

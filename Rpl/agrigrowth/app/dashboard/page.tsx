@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getUser, clearUser } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
+import { toast } from "react-hot-toast";
 
 const imgRice2 = "https://www.figma.com/api/mcp/asset/2d7af9f5-776e-41f7-851d-32ef06f4449b";
 const imgDownload41 = "https://www.figma.com/api/mcp/asset/d97cf4c8-1d28-42b7-b2d3-6398d7fe15a0";
@@ -39,8 +43,27 @@ export default function Dashboard() {
   const [showAnalysisForm, setShowAnalysisForm] = useState(false);
   const [showResultPage, setShowResultPage] = useState(false);
   const [activeTrackerTitle, setActiveTrackerTitle] = useState("");
+  const [activeTrackerId, setActiveTrackerId] = useState<string | null>(null);
   const [activePlantLabel, setActivePlantLabel] = useState("Padi");
-  const userName = "nabil rezon";
+  const [userName, setUserName] = useState("Guest");
+  const router = useRouter();
+
+  useEffect(() => {
+    const user = getUser();
+    if (user && user.name) {
+      setUserName(user.name);
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      clearUser();
+      router.push("/");
+    } catch (error) {
+      console.error("Failed to logout:", error);
+    }
+  };
 
   const handleCreateTracker = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,25 +72,128 @@ export default function Dashboard() {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!selectedPlant) return;
+    
+    const user = getUser();
+    if (!user || !user.id) {
+      toast.error("Anda harus login untuk membuat tracker.");
+      return;
+    }
 
-    // TODO: persist trackerTitle + selectedPlant via API
-    console.log("Creating tracker:", trackerTitle, selectedPlant);
-    setActiveTrackerTitle(trackerTitle);
-    setActivePlantLabel(
-      selectedPlant === "jagung" ? "Jagung" : selectedPlant === "bawang" ? "Bawang Merah" : "Padi",
-    );
-    setShowAnalysisForm(true);
-    setSelectedPlant(null);
-    setIsPlantMenuOpen(false);
+    try {
+      const { data, error } = await supabase
+        .from("trackers")
+        .insert({
+          user_id: user.id,
+          title: trackerTitle,
+          plant_type: selectedPlant,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      setActiveTrackerId(data.id);
+      setActiveTrackerTitle(trackerTitle);
+      setActivePlantLabel(
+        selectedPlant === "jagung" ? "Jagung" : selectedPlant === "bawang" ? "Bawang Merah" : "Padi",
+      );
+      setShowAnalysisForm(true);
+      setSelectedPlant(null);
+      setIsPlantMenuOpen(false);
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Gagal membuat tracker: " + err.message);
+    }
   };
 
-  const handleSaveAnalysis = (e: React.FormEvent) => {
+  const handleSaveAnalysis = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: persist analysis data via API
-    console.log("Saving analysis for:", trackerTitle);
-    setShowResultPage(true);
+    if (!activeTrackerId) {
+      toast.error("Tracker ID tidak ditemukan.");
+      return;
+    }
+
+    const formData = new FormData(e.currentTarget);
+    const dayNumber = parseInt(formData.get("day_number") as string) || 1;
+    const plantHeight = parseFloat(formData.get("plant_height") as string) || null;
+    const leafCount = parseInt(formData.get("leaf_count") as string) || null;
+    const branchCount = parseInt(formData.get("branch_count") as string) || null;
+    const soilPh = parseFloat(formData.get("soil_ph") as string) || null;
+    const landArea = parseFloat(formData.get("land_area") as string) || null;
+
+    if (dayNumber < 1) {
+      toast.error("Hari pengamatan tidak valid.");
+      return;
+    }
+    if (plantHeight !== null && plantHeight < 0) {
+      toast.error("Tinggi tanaman tidak boleh negatif.");
+      return;
+    }
+    if (leafCount !== null && leafCount < 0) {
+      toast.error("Jumlah daun tidak boleh negatif.");
+      return;
+    }
+    if (branchCount !== null && branchCount < 0) {
+      toast.error("Jumlah cabang tidak boleh negatif.");
+      return;
+    }
+    if (soilPh !== null && (soilPh < 0 || soilPh > 14)) {
+      toast.error("Input pH tanah tidak sesuai (harus antara 0 - 14).");
+      return;
+    }
+    if (landArea !== null && landArea < 0) {
+      toast.error("Luas lahan tidak boleh negatif.");
+      return;
+    }
+
+    const lightCondition = formData.get("light_condition") as string || null;
+    const plantCondition = formData.get("plant_condition") as string || null;
+
+    // Check if conditions contain only numbers
+    const isOnlyNumeric = (str: string | null) => str !== null && /^[0-9.]+$/.test(str);
+
+    if (isOnlyNumeric(lightCondition)) {
+      toast.error("Kondisi cahaya tidak boleh hanya berisi angka.");
+      return;
+    }
+
+    if (isOnlyNumeric(plantCondition)) {
+      toast.error("Kondisi tanaman tidak boleh hanya berisi angka.");
+      return;
+    }
+
+    const logData = {
+      tracker_id: activeTrackerId,
+      day_number: dayNumber,
+      plant_height: plantHeight,
+      leaf_count: leafCount,
+      branch_count: branchCount,
+      soil_ph: soilPh,
+      light_condition: lightCondition,
+      plant_condition: plantCondition,
+      fertilizer_type: formData.get("fertilizer_type") as string || null,
+      land_area: landArea,
+    };
+
+    try {
+      const { error } = await supabase.from("growth_logs").insert(logData);
+      if (error) throw error;
+      
+      toast.success("Data pengamatan berhasil disimpan!");
+      setShowResultPage(true);
+    } catch (err: any) {
+      console.error(err);
+      // Ganti pesan error Supabase dengan pesan yang lebih ramah pengguna
+      if (err.message?.includes("check_light_not_numeric")) {
+        toast.error("Kondisi cahaya tidak boleh hanya berisi angka.");
+      } else if (err.message?.includes("check_condition_not_numeric")) {
+        toast.error("Kondisi tanaman tidak boleh hanya berisi angka.");
+      } else {
+        toast.error("Gagal menyimpan data pengamatan: " + err.message);
+      }
+    }
   };
 
   if (showResultPage) {
@@ -92,9 +218,17 @@ export default function Dashboard() {
               </Link>
             </nav>
 
-            <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[14px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[16px] lg:text-[18px]">
-              <span>{userName}</span>
-              <img alt="Profile" className="h-8 w-8 object-contain" src={imgResultProfile} />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[14px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[16px] lg:text-[18px]">
+                <span>{userName}</span>
+                <img alt="Profile" className="h-8 w-8 object-contain" src={imgResultProfile} />
+              </div>
+              <button 
+                onClick={handleLogout}
+                className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
+              >
+                Logout
+              </button>
             </div>
           </header>
 
@@ -194,9 +328,17 @@ export default function Dashboard() {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
-            <span>{userName}</span>
-            <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
+              <span>{userName}</span>
+              <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+            </div>
+            <button 
+              onClick={handleLogout}
+              className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
+            >
+              Logout
+            </button>
           </div>
         </header>
 
@@ -219,6 +361,7 @@ export default function Dashboard() {
                   />
                   <div className="relative bg-white">
                     <input
+                      name="day_number"
                       type="text"
                       defaultValue="1"
                       className="h-[38px] w-full bg-white px-4 pr-10 text-[14px] text-[#365a1a] outline-none"
@@ -233,9 +376,9 @@ export default function Dashboard() {
                   Input data pertumbuhan tanaman
                 </div>
                 <div className="grid grid-cols-1 gap-px bg-[#365a1a] sm:grid-cols-3">
-                  <input type="text" placeholder="Input tinggi tanaman............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
-                  <input type="text" placeholder="Input jumlah daun............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
-                  <input type="text" placeholder="Input jumlah cabang............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="plant_height" type="text" placeholder="Input tinggi tanaman............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="leaf_count" type="text" placeholder="Input jumlah daun............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="branch_count" type="text" placeholder="Input jumlah cabang............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
                 </div>
               </div>
 
@@ -244,9 +387,9 @@ export default function Dashboard() {
                   Input kondisi lingkungan
                 </div>
                 <div className="grid grid-cols-1 gap-px bg-[#365a1a] sm:grid-cols-3">
-                  <input type="text" placeholder="Input pH tanah............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
-                  <input type="text" placeholder="Input kondisi cahaya............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
-                  <input type="text" placeholder="Input kondisi tanaman............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="soil_ph" type="text" placeholder="Input pH tanah............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="light_condition" type="text" placeholder="Input kondisi cahaya............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="plant_condition" type="text" placeholder="Input kondisi tanaman............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
                 </div>
               </div>
 
@@ -255,8 +398,8 @@ export default function Dashboard() {
                   Kebutuhan pupuk dengan konversi luas lahan
                 </div>
                 <div className="grid grid-cols-1 gap-px bg-[#365a1a] sm:grid-cols-2">
-                  <input type="text" placeholder="Input Jenis pupuk............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
-                  <input type="text" placeholder="Input luas lahan............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="fertilizer_type" type="text" placeholder="Input Jenis pupuk............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
+                  <input name="land_area" type="text" placeholder="Input luas lahan............." className="h-[38px] bg-white px-3 text-[13px] text-[#365a1a] outline-none placeholder:text-[#9fb08d]" />
                 </div>
               </div>
 
@@ -293,9 +436,17 @@ export default function Dashboard() {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
-          <span>{userName}</span>
-          <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
+            <span>{userName}</span>
+            <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+          </div>
+          <button 
+            onClick={handleLogout}
+            className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
+          >
+            Logout
+          </button>
         </div>
       </header>
 

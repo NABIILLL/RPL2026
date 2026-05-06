@@ -21,9 +21,28 @@ export default function Home() {
   // Auto-open modal jika user belum login
   useEffect(() => {
     if (!isLoading && !user) {
-      setIsModalOpen(true);
+      // Kita tambahkan jeda sedikit agar onAuthStateChange punya waktu untuk memproses link email
+      const timer = setTimeout(() => {
+        setIsModalOpen(true);
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [user, isLoading]);
+
+  useEffect(() => {
+    import("@/lib/supabase").then(({ supabase }) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          // Hanya memunculkan alert jika hash di URL menandakan konfirmasi atau akses token
+          if (window.location.hash.includes('access_token') || window.location.href.includes('code=')) {
+            alert("Konfirmasi Berhasil! Anda telah berhasil login.");
+            router.push("/dashboard");
+          }
+        }
+      });
+      return () => subscription.unsubscribe();
+    });
+  }, [router]);
 
   const handleGetStarted = () => {
     if (user) {

@@ -13,17 +13,64 @@ export function useUser() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading user data from localStorage or an API
-    try {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
+    let mounted = true;
+
+    // Load function to sync state
+    const syncSession = async () => {
+      try {
+        const { supabase } = await import('@/lib/supabase');
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session && mounted) {
+          const u = {
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+            email: session.user.email,
+            id: session.user.id,
+            role: session.user.user_metadata?.role
+          };
+          localStorage.setItem('user', JSON.stringify(u));
+          setUser(u);
+        } else if (mounted) {
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            setUser(JSON.parse(storedUser));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load session:', error);
+      } finally {
+        if (mounted) setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Failed to load user:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    };
+
+    syncSession();
+
+    // Listen to changes (login, logout, token refresh, email confirm)
+    import('@/lib/supabase').then(({ supabase }) => {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && mounted) {
+          const u = {
+            name: session.user.user_metadata?.name || session.user.email?.split('@')[0] || 'User',
+            email: session.user.email,
+            id: session.user.id,
+            role: session.user.user_metadata?.role
+          };
+          localStorage.setItem('user', JSON.stringify(u));
+          setUser(u);
+        } else if (event === 'SIGNED_OUT' && mounted) {
+          setUser(null);
+          localStorage.removeItem('user');
+        }
+      });
+
+      return () => {
+        subscription.unsubscribe();
+      };
+    });
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   return { user, isLoading };

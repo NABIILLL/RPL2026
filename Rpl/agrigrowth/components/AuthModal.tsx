@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveUser } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 
 const imgGroup2 =
   "https://www.figma.com/api/mcp/asset/53ed4b6a-3620-47a5-954d-05c77858f9f7";
@@ -64,11 +65,33 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     }
   };
 
-  const handleSignUpEmailNext = (e: React.FormEvent) => {
+  const handleSignUpEmailNext = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Send verification email
-    console.log("Send verification email to:", email);
-    setStep("signup-email");
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            role,
+          }
+        }
+      });
+      if (error) throw error;
+
+      // Jika konfirmasi email diaktifkan di Supabase, session akan bernilai null
+      if (data.user && data.session === null) {
+        alert("Pendaftaran berhasil! Silakan cek kotak masuk email Anda untuk mengkonfirmasi akun sebelum masuk.");
+        setStep("choice");
+        return;
+      }
+
+      saveUser({ id: data.user?.id, name, email, role });
+      handleAuthSuccess();
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   const handleSignUpEmailVerify = (e: React.FormEvent) => {
@@ -100,11 +123,25 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     handleAuthSuccess();
   };
 
-  const handleLoginEmailNext = (e: React.FormEvent) => {
+  const handleLoginEmailNext = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Verify credentials
-    saveUser({ email, name: email.split("@")[0] });
-    handleAuthSuccess();
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      if (error) throw error;
+
+      saveUser({
+        id: data.user?.id,
+        email,
+        name: data.user?.user_metadata?.name || email.split("@")[0],
+        role: data.user?.user_metadata?.role
+      });
+      handleAuthSuccess();
+    } catch (error: any) {
+      alert(error.message);
+    }
   };
 
   const handleLoginPhoneNext = (e: React.FormEvent) => {
