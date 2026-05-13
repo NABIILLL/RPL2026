@@ -24,20 +24,27 @@ export default function AuthCallback() {
         }
 
         const { data: { session } } = await supabase.auth.getSession();
-        const userId = session?.user?.id;
+        const user = session?.user;
 
-        if (userId) {
-          const { data, error } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", userId)
-            .maybeSingle();
+        if (user?.id) {
+          let role = user.user_metadata?.role || null;
 
-          if (error) {
-            console.error("Error fetching user role:", error);
+          if (session?.access_token) {
+            const response = await fetch("/api/auth/role", {
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+              },
+            });
+
+            if (response.ok) {
+              const payload = await response.json();
+              role = payload?.role || role;
+            } else {
+              console.error("Error fetching user role:", response.status);
+            }
           }
 
-          const target = data?.role === "admin" ? "/admin" : "/dashboard";
+          const target = role === "admin" ? "/admin" : "/dashboard";
           router.replace(target);
           return;
         }

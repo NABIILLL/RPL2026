@@ -45,7 +45,10 @@ export async function POST(request: Request) {
     email,
     password,
     email_confirm: true,
-    user_metadata: { name },
+    user_metadata: {
+      name,
+      ...(role ? { role } : {}),
+    },
   });
 
   if (error || !data?.user) {
@@ -83,7 +86,10 @@ export async function PATCH(request: Request) {
   const { data, error } = await supabase.auth.admin.updateUserById(id, {
     email,
     password,
-    user_metadata: name ? { name } : undefined,
+    user_metadata: name || role ? {
+      ...(name ? { name } : {}),
+      ...(role ? { role } : {}),
+    } : undefined,
   });
 
   if (error) {

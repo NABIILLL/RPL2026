@@ -158,7 +158,10 @@ export default function AdminUsersPage() {
             <input className="form-input" placeholder="Nama" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
             <input className="form-input" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
             <input className="form-input" placeholder="Password" type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} />
-            <input className="form-input" placeholder="Role (admin/user)" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} />
+            <select className="form-input" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
+              <option value="user">user</option>
+              <option value="admin">admin</option>
+            </select>
           </div>
         </div>
       </div>
