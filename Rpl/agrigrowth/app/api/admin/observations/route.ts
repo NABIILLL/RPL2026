@@ -5,17 +5,41 @@ export async function GET(request: Request) {
   const { response } = await requireAdmin(request);
   if (response) return response;
 
-  const supabase = getSupabaseService();
-  const { data, error } = await supabase
-    .from("growth_logs")
-    .select("*")
-    .order("created_at", { ascending: false });
+  try {
+    const supabase = getSupabaseService();
+    const { data, error } = await supabase
+      .from("growth_logs")
+      .select("*")
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ observations: data || [] });
+  } catch (err) {
+    // Fallback if SUPABASE_SERVICE_ROLE_KEY is missing
+    const authHeader = request.headers.get("authorization") || "";
+    const token = authHeader.toLowerCase().startsWith("bearer ") ? authHeader.slice(7) : null;
+    const { createClient } = await import("@supabase/supabase-js");
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false },
+    });
+    
+    const { data, error } = await authClient
+      .from("growth_logs")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ observations: data || [] });
   }
-
-  return NextResponse.json({ observations: data || [] });
 }
 
 export async function POST(request: Request) {

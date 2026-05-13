@@ -44,12 +44,32 @@ export const requireAdmin = async (request: Request) => {
     return { userId: null, response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
   }
 
-  const service = getServiceClient();
-  const { data: roleData, error: roleError } = await service
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", data.user.id)
-    .maybeSingle();
+  let roleData = null;
+  let roleError = null;
+
+  try {
+    const service = getServiceClient();
+    const { data: dbData, error: dbError } = await service
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+    roleData = dbData;
+    roleError = dbError;
+  } catch (err) {
+    // If missing service key, try using anon client (user's own token)
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false },
+    });
+    const { data: dbData, error: dbError } = await authClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+    roleData = dbData;
+    roleError = dbError;
+  }
 
   if (roleError || roleData?.role !== "admin") {
     if (

@@ -21,12 +21,36 @@ export async function GET(request: Request) {
     return NextResponse.json({ role: null });
   }
 
-  const service = getSupabaseService();
-  const { data: roleData, error: roleError } = await service
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", data.user.id)
-    .maybeSingle();
+  let roleData = null;
+  let roleError = null;
+
+  try {
+    const service = getSupabaseService();
+    const { data: dbData, error: dbError } = await service
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+      
+    roleData = dbData;
+    roleError = dbError;
+  } catch (err) {
+    // getSupabaseService() might throw if missing SUPABASE_SERVICE_ROLE_KEY
+    // Fallback: Try fetching using the user's own token (works if RLS permits)
+    const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    
+    const { data: dbData, error: dbError } = await authClient
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", data.user.id)
+      .maybeSingle();
+      
+    roleData = dbData;
+    roleError = dbError;
+  }
 
   if (roleError || !roleData) {
     // Fallback: If user's email contains 'admin' or user_metadata.role is admin, grant admin role
