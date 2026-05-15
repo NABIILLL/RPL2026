@@ -134,10 +134,8 @@ export function useUser() {
           localStorage.setItem('user', JSON.stringify(u));
           setUser(u);
         } else if (mounted) {
-          const storedUser = localStorage.getItem('user');
-          if (storedUser) {
-            setUser(JSON.parse(storedUser));
-          }
+          localStorage.removeItem('user');
+          setUser(null);
         }
       } catch (error) {
         console.warn('Warning: Failed to load session', error);

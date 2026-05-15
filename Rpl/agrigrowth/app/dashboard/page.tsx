@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { getUser, clearUser } from "@/lib/auth";
+import { clearUser } from "@/lib/auth";
 import { useUser } from "@/hooks/useUser";
 import { supabase } from "@/lib/supabase";
 import { toast } from "react-hot-toast";
@@ -55,6 +55,13 @@ export default function Dashboard() {
   const router = useRouter();
   const displayName = !isLoading && user ? user.name : "Guest";
 
+  // Block direct access when there is no active Supabase session.
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.replace("/");
+    }
+  }, [isLoading, user, router]);
+
   // Redirect admins to the admin dashboard
   useEffect(() => {
     if (!isLoading && user?.role === "admin") {
@@ -82,7 +89,6 @@ export default function Dashboard() {
   const handleContinue = async () => {
     if (!selectedPlant) return;
 
-    const user = getUser();
     if (!user || !user.id) {
       toast.error("Anda harus login untuk membuat tracker.");
       return;
