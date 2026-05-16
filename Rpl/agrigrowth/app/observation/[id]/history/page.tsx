@@ -16,6 +16,8 @@ import {
   Tooltip,
   ResponsiveContainer
 } from "recharts";
+import { jsPDF } from "jspdf";
+import * as htmlToImage from "html-to-image";
 
 const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
 const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
@@ -60,6 +62,7 @@ export default function ObservationHistory() {
     avgLeafGrowth: 0
   });
   const userId = user?.id;
+  const [isExporting, setIsExporting] = useState(false);
 
   // Fetch list of trackers first
   useEffect(() => {
@@ -396,6 +399,65 @@ export default function ObservationHistory() {
     );
   }
 
+  async function handleExportPDF() {
+    if (!userId) {
+      toast.error("Anda harus login untuk export PDF");
+      return;
+    }
+    const element = document.getElementById("pdf-content");
+    if (!element) {
+      toast.error("Tidak ada konten untuk di-export");
+      return;
+    }
+
+    setIsExporting(true);
+    const toastId = toast.loading("Menyiapkan dan mengunggah PDF...");
+
+    try {
+      // Use toJpeg to reduce file size (quality 0.8 is usually a good balance)
+      const dataUrl = await htmlToImage.toJpeg(element, { 
+        quality: 0.8, 
+        pixelRatio: 1.5,
+        backgroundColor: '#f4f4f4', // to ensure no black backgrounds on transparent areas
+      });
+      
+      const pdfWidth = 210; // A4 width in mm
+      // Calculate dynamic height based on the full scrollHeight of the container
+      const pdfHeight = (element.scrollHeight * pdfWidth) / element.scrollWidth;
+      
+      // Create a PDF with a custom height so it fits exactly one long continuous page
+      const pdf = new jsPDF({
+        orientation: "p",
+        unit: "mm",
+        format: [pdfWidth, pdfHeight]
+      });
+      
+      pdf.addImage(dataUrl, "JPEG", 0, 0, pdfWidth, pdfHeight);
+      
+      const pdfBlob = pdf.output("blob");
+
+      const fileName = `${userId}/Laporan_${trackerTitle}_${Date.now()}.pdf`;
+      const { data, error } = await supabase
+        .storage
+        .from("agrigrowthpdf")
+        .upload(fileName, pdfBlob, {
+          contentType: "application/pdf",
+          upsert: true
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success("PDF berhasil disimpan ke Storage!", { id: toastId });
+    } catch (err: any) {
+      console.error("Export PDF Error:", err);
+      toast.error(`Gagal menyimpan PDF: ${err.message}`, { id: toastId });
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
       {/* Header */}
@@ -446,8 +508,12 @@ export default function ObservationHistory() {
             >
               ➕ Input Data
             </Link>
-            <button className="rounded-full bg-white px-6 py-2.5 text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition">
-              📥 Export PDF
+            <button 
+              onClick={handleExportPDF}
+              disabled={isExporting || !selectedTrackerId || chartData.length === 0}
+              className="rounded-full bg-white px-6 py-2.5 text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition disabled:opacity-50"
+            >
+              {isExporting ? "Memproses..." : "📥 Export PDF"}
             </button>
             <button className="rounded-full bg-white px-6 py-2.5 text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition">
               📤 Share
@@ -455,7 +521,7 @@ export default function ObservationHistory() {
           </div>
         </div>
 
-        <div className="mt-10">
+        <div id="pdf-content" className="mt-10 p-2 sm:p-4 bg-[#f4f4f4]">
           {loading ? (
             <div className="flex flex-col items-center justify-center rounded-[20px] bg-white py-16 px-6 text-center shadow-sm border border-gray-100">
               <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#365a1a] border-t-transparent"></div>
