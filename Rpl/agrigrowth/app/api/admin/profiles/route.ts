@@ -57,8 +57,7 @@ export async function PATCH(request: Request) {
   const supabase = getSupabaseService();
   const { data, error } = await supabase
     .from("profiles")
-    .update(updates)
-    .eq("id", id)
+    .upsert({ id, ...updates }, { onConflict: "id" })
     .select()
     .single();
 

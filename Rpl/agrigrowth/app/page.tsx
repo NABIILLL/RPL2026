@@ -1,9 +1,9 @@
 "use client";
 
 const heroBackground =
-  "https://www.figma.com/api/mcp/asset/dda11176-c1ae-42fa-af1c-91d858f5e2ae";
+  "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=2000&auto=format&fit=crop";
 const logoMark =
-  "https://www.figma.com/api/mcp/asset/eb8b6bb8-e06c-41c9-9ec8-8aca0e559999";
+  "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";

@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
 import { UserCircle2 } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
-import { clearUser } from "@/lib/auth";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 
 const logoMark = "https://www.figma.com/api/mcp/asset/eb8b6bb8-e06c-41c9-9ec8-8aca0e559999";
 
@@ -15,17 +14,7 @@ interface HeaderWithModalProps {
 
 export default function HeaderWithModal({ onSignUpClick, onSignInClick }: HeaderWithModalProps) {
   const { user, isLoading } = useUser();
-
-  const handleLogout = async () => {
-    try {
-      const { supabase } = await import("@/lib/supabase");
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-    clearUser();
-    window.location.reload();
-  };
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
 
   return (
     <>
@@ -53,9 +42,10 @@ export default function HeaderWithModal({ onSignUpClick, onSignInClick }: Header
               </Link>
               <button
                 onClick={handleLogout}
+                disabled={isLoggingOut}
                 className="text-sm font-semibold text-white/90 hover:text-white transition"
               >
-                Logout
+                {isLoggingOut ? "Keluar..." : "Logout"}
               </button>
             </div>
           ) : (

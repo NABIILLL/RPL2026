@@ -1,18 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { clearUser } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { useState } from "react";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import { useUser } from "@/hooks/useUser";
 import AuthModal from "@/components/AuthModal";
 
-const imgComplementary3 = "https://www.figma.com/api/mcp/asset/84e7de7d-b48c-4c40-b61c-1968ea49e884";
-const imgWallpaperDelDia1 = "https://www.figma.com/api/mcp/asset/4213c44b-ff10-496c-bc18-99da660c77f8";
-const imgRiceField01ByGarkiOnDeviantArt1 = "https://www.figma.com/api/mcp/asset/4883cfb8-9252-42df-9223-ab5a7e993930";
-const imgLogo = "https://www.figma.com/api/mcp/asset/1ec87735-8093-48cd-bfb5-5836d3ed91fd";
-const imgProfile = "https://www.figma.com/api/mcp/asset/31743631-af9c-4f0e-b6cb-164cffff6bf1";
+const imgComplementary3 = "https://images.unsplash.com/photo-1592982537447-6f2a6a0c5c8e?q=80&w=800&auto=format&fit=crop";
+const imgWallpaperDelDia1 = "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=2000&auto=format&fit=crop";
+const imgRiceField01ByGarkiOnDeviantArt1 = "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop";
+const imgLogo = "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=800&auto=format&fit=crop";
+const imgProfile = "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=800&auto=format&fit=crop";
 
 const featureCards = [
 	{
@@ -38,17 +36,7 @@ const featureCards = [
 export default function Wireframe4() {
 	const { user, isLoading } = useUser();
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const router = useRouter();
-
-	const handleLogout = async () => {
-		try {
-			await supabase.auth.signOut();
-			clearUser();
-			router.push("/");
-		} catch (error) {
-			console.error("Failed to logout:", error);
-		}
-	};
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
 
 	return (
 		<main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
@@ -79,8 +67,8 @@ export default function Wireframe4() {
 								onClick={handleLogout}
 								className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
 							>
-								Logout
-							</button>
+                {isLoggingOut ? "Keluar..." : "Logout"}
+              </button>
 						</div>
 					) : (
 						<button 

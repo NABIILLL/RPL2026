@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { supabase } from "@/lib/supabase";
 import { useUser } from "@/hooks/useUser";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import {
   LineChart,
   Line,
@@ -16,7 +17,8 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-const imgLogo = "https://www.figma.com/api/mcp/asset/2a7fcedd-9f30-4d90-8e58-295d41707608";
+const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
+const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
 
 interface TrackerData {
   id: string;
@@ -32,6 +34,7 @@ export default function ObservationHistory() {
   const id = params.id as string;
   const trackerIdFromQuery = searchParams.get("trackerId");
   const { user, isLoading } = useUser();
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
   const [trackers, setTrackers] = useState<TrackerData[]>([]);
   const [selectedTrackerId, setSelectedTrackerId] = useState<string | null>(null);
   const [chartData, setChartData] = useState<any[]>([]);
@@ -322,9 +325,20 @@ export default function ObservationHistory() {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px]">
-          <span>{!isLoading && user ? user.name : "Guest"}</span>
-        </div>
+        {!isLoading && user ? (
+          <div className="flex items-center gap-4">
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
+            >
+              <span>{user.name}</span>
+              <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+            </Link>
+            <button onClick={handleLogout} disabled={isLoggingOut} className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
+              {isLoggingOut ? "Keluar..." : "Logout"}
+            </button>
+          </div>
+        ) : null}
       </header>
 
       {/* Content */}

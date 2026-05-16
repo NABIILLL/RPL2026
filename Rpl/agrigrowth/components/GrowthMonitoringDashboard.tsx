@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useUser } from "@/hooks/useUser";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 const imgLogo = "https://www.figma.com/api/mcp/asset/1ec87735-8093-48cd-bfb5-5836d3ed91fd";
@@ -30,6 +31,7 @@ export default function GrowthMonitoringDashboard({
   ],
 }: GrowthMonitoringDashboardProps) {
   const { user, isLoading } = useUser();
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
 
   // Convert height strings to numeric values for charting
   const heightValue = (heightStr: string) => {
@@ -66,13 +68,20 @@ export default function GrowthMonitoringDashboard({
           </Link>
         </nav>
 
-        <Link
-          href="/profile"
-          className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
-        >
-          <span>{!isLoading && user ? user.name : "Guest"}</span>
-          <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
-        </Link>
+        {!isLoading && user ? (
+          <div className="flex items-center gap-4">
+            <Link
+              href="/profile"
+              className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
+            >
+              <span>{user.name}</span>
+              <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+            </Link>
+            <button onClick={handleLogout} disabled={isLoggingOut} className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
+              {isLoggingOut ? "Keluar..." : "Logout"}
+            </button>
+          </div>
+        ) : null}
       </header>
 
       {/* Main Content */}

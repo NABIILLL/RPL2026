@@ -2,28 +2,18 @@
 
 import Link from "next/link";
 
-const imgLogo = "https://www.figma.com/api/mcp/asset/2a7fcedd-9f30-4d90-8e58-295d41707608";
-const imgProfile = "https://www.figma.com/api/mcp/asset/6e3b48fa-6d46-4818-a4c8-3a548e391ebd";
+const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
+const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
 
 import { useUser } from "@/hooks/useUser";
 import AuthModal from "@/components/AuthModal";
 import { useState } from "react";
-import { supabase } from "@/lib/supabase";
-import { clearUser } from "@/lib/auth";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 
 export default function About() {
   const { user, isLoading } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      clearUser();
-      window.location.reload();
-    } catch (error) {
-      console.error("Failed to logout:", error);
-    }
-  };
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
 
   return (
     <main className="min-h-screen bg-white text-[#365a1a]">
@@ -57,8 +47,8 @@ export default function About() {
                 <span>{user.name}</span>
                 <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
               </Link>
-              <button onClick={handleLogout} className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
-                Logout
+              <button onClick={handleLogout} disabled={isLoggingOut} className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
+                {isLoggingOut ? "Keluar..." : "Logout"}
               </button>
             </div>
           ) : (

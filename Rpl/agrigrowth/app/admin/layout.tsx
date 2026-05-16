@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import "./admin.css";
 
 const navSections = [
@@ -21,6 +22,12 @@ const navSections = [
       { label: "Observations", href: "/admin/observations", icon: "ti ti-notes" },
     ],
   },
+  {
+    label: "Account",
+    items: [
+      { label: "Admin Profile", href: "/admin/profile", icon: "ti ti-user-circle" },
+    ],
+  },
 ];
 
 const flattenNav = navSections.flatMap((section) => section.items);
@@ -28,8 +35,18 @@ const flattenNav = navSections.flatMap((section) => section.items);
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useUser();
   const pathname = usePathname();
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
   const current = flattenNav.find((item) => item.href === pathname);
   const currentLabel = current?.label ?? "Dashboard";
+  const adminName = user?.name || "Admin";
+  const adminInitials = (
+    adminName
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .slice(0, 2)
+      .join("") || "AD"
+  ).toUpperCase();
 
   if (isLoading) {
     return (
@@ -91,12 +108,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="sidebar-footer">
             <div className="admin-chip">
-              <div className="admin-avatar">SA</div>
+              <div className="admin-avatar">{adminInitials}</div>
               <div className="admin-info">
-                <div className="admin-name">Super Admin</div>
+                <div className="admin-name">{adminName}</div>
                 <div className="admin-role">Full Access · Online</div>
               </div>
-              <i className="ti ti-dots-vertical" style={{ fontSize: 15, color: "var(--text4)", cursor: "pointer" }}></i>
+            </div>
+            <div className="admin-footer-actions">
+              <Link href="/admin/profile" className="admin-footer-btn" title="Profil admin">
+                <i className="ti ti-user-circle"></i>
+                Profil
+              </Link>
+              <button
+                type="button"
+                className="admin-footer-btn danger"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                title="Logout"
+              >
+                <i className="ti ti-logout"></i>
+                {isLoggingOut ? "Keluar..." : "Logout"}
+              </button>
             </div>
           </div>
         </aside>

@@ -1,28 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
-import { supabase } from "@/lib/supabase";
-import { clearUser } from "@/lib/auth";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 
-const imgGrowthTrackerImage = "https://www.figma.com/api/mcp/asset/0f007e12-4c18-46b6-ad68-a156ab1be51b";
-const imgLogo = "https://www.figma.com/api/mcp/asset/90530aab-9c02-498f-97a0-e57018497d3e";
-const imgProfile = "https://www.figma.com/api/mcp/asset/03caec6e-0209-4de6-a510-5e7ebeb6fffd";
+const imgGrowthTrackerImage = "https://images.unsplash.com/photo-1592982537447-6f2a6a0c5c8e?q=80&w=800&auto=format&fit=crop";
+const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
+const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
 
 export default function GrowthTracker() {
   const { user, isLoading } = useUser();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      clearUser();
-      router.push("/");
-    } catch (error) {
-      console.error("Failed to logout:", error);
-    }
-  };
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
 
   return (
     <main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
@@ -59,7 +47,7 @@ export default function GrowthTracker() {
                 onClick={handleLogout}
                 className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
               >
-                Logout
+                {isLoggingOut ? "Keluar..." : "Logout"}
               </button>
             </div>
           ) : (

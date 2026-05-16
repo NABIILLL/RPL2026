@@ -23,11 +23,10 @@ import {
 import { useUser } from "@/hooks/useUser";
 import AuthModal from "@/components/AuthModal";
 import ProfileEditor from "@/components/ProfileEditor";
-import { supabase } from "@/lib/supabase";
-import { clearUser } from "@/lib/auth";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 
-const imgLogo = "https://www.figma.com/api/mcp/asset/2a7fcedd-9f30-4d90-8e58-295d41707608";
-const imgProfile = "https://www.figma.com/api/mcp/asset/6e3b48fa-6d46-4818-a4c8-3a548e391ebd";
+const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
+const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
 
 const defaultProfile = {
   name: "Budi Raharjo",
@@ -100,21 +99,17 @@ export default function ProfilePage() {
       .slice(0, 2)
       .join("") || "AG"
   ).toUpperCase();
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      clearUser();
-      window.location.reload();
-    } catch (error) {
-      console.error("Failed to logout:", error);
-    }
-  };
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
 
   return (
     <main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
       <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-      <ProfileEditor isOpen={isEditModalOpen} user={user} onClose={() => setIsEditModalOpen(false)} />
+      <ProfileEditor
+        key={isEditModalOpen ? `profile-editor-open-${user?.id || "guest"}` : `profile-editor-closed-${user?.id || "guest"}`}
+        isOpen={isEditModalOpen}
+        user={user}
+        onClose={() => setIsEditModalOpen(false)}
+      />
 
       <header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
         <div className="flex items-center gap-2.5">
@@ -148,7 +143,7 @@ export default function ProfilePage() {
                 onClick={handleLogout}
                 className="text-sm font-bold text-[#365a1a] transition hover:opacity-80"
               >
-                Logout
+                {isLoggingOut ? "Keluar..." : "Logout"}
               </button>
             </div>
           ) : (

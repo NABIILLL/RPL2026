@@ -50,6 +50,12 @@
 .admin-app .admin-info{flex:1;min-width:0}
 .admin-app .admin-name{font-size:12px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .admin-app .admin-role{font-size:10px;color:var(--text3)}
+.admin-app .admin-footer-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.admin-app .admin-footer-btn{height:32px;border-radius:8px;border:1px solid var(--border2);background:transparent;color:var(--text3);display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:'Sora',sans-serif;font-size:11px;font-weight:500;text-decoration:none;cursor:pointer;transition:.15s}
+.admin-app .admin-footer-btn:hover{background:var(--surface2);color:var(--text2)}
+.admin-app .admin-footer-btn.danger{color:var(--red);border-color:rgba(224,82,82,0.25)}
+.admin-app .admin-footer-btn.danger:hover{background:var(--red-bg);color:var(--red)}
+.admin-app .admin-footer-btn i{font-size:15px}
 
 .admin-app .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 
@@ -228,6 +234,31 @@
 .admin-app .onboard-prog-fill{height:100%;background:var(--g500);border-radius:99px;width:65%}
 .admin-app .onboard-prog-lbl{font-size:10px;color:var(--text3);margin-top:4px}
 
+.admin-app .admin-profile-grid{display:grid;grid-template-columns:1.35fr .9fr;gap:14px;align-items:start}
+.admin-app .admin-profile-hero{min-height:220px;border:1px solid var(--border);border-radius:12px;background:linear-gradient(135deg,var(--surface) 0%,var(--bg3) 62%,rgba(91,155,213,0.14) 100%);display:flex;align-items:flex-end;gap:18px;padding:22px;position:relative;overflow:hidden}
+.admin-app .admin-profile-hero::after{content:'';position:absolute;right:-50px;top:-60px;width:190px;height:190px;border-radius:50%;border:1px solid var(--border2);background:rgba(99,153,34,0.08)}
+.admin-app .admin-profile-avatar{width:82px;height:82px;border-radius:18px;background:var(--g600);border:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:28px;color:#fff;box-shadow:0 18px 40px rgba(0,0,0,.22);flex-shrink:0;z-index:1}
+.admin-app .admin-profile-main{z-index:1;min-width:0}
+.admin-app .admin-profile-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--g300);font-weight:600;margin-bottom:4px}
+.admin-app .admin-profile-main h1{font-family:'Fraunces',serif;font-size:32px;font-weight:500;line-height:1.05;color:var(--text);margin:0}
+.admin-app .admin-profile-email{font-size:12px;color:var(--text3);margin-top:6px;word-break:break-word}
+.admin-app .admin-profile-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.admin-app .admin-profile-meta{display:grid;gap:0}
+.admin-app .admin-profile-meta div{padding:13px 16px;border-bottom:1px solid var(--border)}
+.admin-app .admin-profile-meta div:last-child{border-bottom:none}
+.admin-app .admin-profile-meta span{display:block;font-size:10px;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.admin-app .admin-profile-meta strong{display:block;font-size:12px;color:var(--text2);font-weight:500;word-break:break-word}
+.admin-app .admin-profile-form-panel{grid-column:1 / -1}
+.admin-app .admin-profile-form{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:16px}
+.admin-app .admin-profile-form label span{display:block;font-size:10px;color:var(--text4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.admin-app .admin-profile-wide{grid-column:1 / -1}
+.admin-app textarea.form-input{resize:vertical;min-height:92px}
+.admin-app .admin-profile-alert{grid-column:1 / -1;border-radius:8px;padding:10px 12px;font-size:12px;border:1px solid var(--border2)}
+.admin-app .admin-profile-alert.success{background:rgba(46,184,122,0.1);color:var(--teal);border-color:rgba(46,184,122,0.24)}
+.admin-app .admin-profile-alert.error{background:var(--red-bg);color:var(--red);border-color:rgba(224,82,82,0.25)}
+.admin-app .admin-profile-actions{grid-column:1 / -1;display:flex;justify-content:flex-end}
+.admin-app button:disabled{opacity:.55;cursor:not-allowed}
+
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 .admin-app .panel,.admin-app .kpi-card{animation:fadeUp .3s ease both}
 .admin-app .kpi-card:nth-child(1){animation-delay:.05s}
@@ -237,11 +268,14 @@
 
 @media (max-width: 1200px){
   .admin-app .kpi-grid{grid-template-columns:repeat(2,1fr)}
-  .admin-app .grid-3-2,.admin-app .grid-3{grid-template-columns:1fr}
+  .admin-app .grid-3-2,.admin-app .grid-3,.admin-app .admin-profile-grid{grid-template-columns:1fr}
 }
 
 @media (max-width: 900px){
   .admin-app .sidebar{display:none}
   .admin-app .topbar{flex-wrap:wrap;height:auto;padding:12px 16px}
   .admin-app .topbar-search{order:3;max-width:none;margin:6px 0 0}
+  .admin-app .admin-profile-form{grid-template-columns:1fr}
+  .admin-app .admin-profile-hero{align-items:flex-start;flex-direction:column}
+  .admin-app .admin-profile-main h1{font-size:26px}
 }

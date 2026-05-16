@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import type { RealtimeChannel, Session, User as SupabaseUser } from '@supabase/supabase-js';
+import type { supabase as supabaseInstance } from '@/lib/supabase';
 
 export interface UserProfile {
   id: string;
@@ -14,7 +16,28 @@ export interface UserProfile {
   updated_at?: string;
 }
 
-const resolveUserName = (sessionUser: any) => {
+type SupabaseBrowserClient = typeof supabaseInstance;
+type ProfileRow = Partial<UserProfile>;
+
+const isUserProfile = (value: unknown): value is UserProfile => {
+  return Boolean(value && typeof value === 'object' && 'id' in value && 'name' in value);
+};
+
+const readStoredUser = () => {
+  if (typeof window === 'undefined') return null;
+
+  const storedUser = localStorage.getItem('user');
+  if (!storedUser) return null;
+
+  try {
+    const parsed = JSON.parse(storedUser) as unknown;
+    return isUserProfile(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+};
+
+const resolveUserName = (sessionUser: Pick<SupabaseUser, 'email' | 'user_metadata'>) => {
   const metadata = sessionUser?.user_metadata || {};
   return (
     metadata.name ||
@@ -31,7 +54,17 @@ export function useUser() {
 
   useEffect(() => {
     let mounted = true;
-    let channel: any = null;
+    let channel: RealtimeChannel | null = null;
+    let authSubscription: { unsubscribe: () => void } | null = null;
+    let supabaseClient: SupabaseBrowserClient | null = null;
+    const channelInstanceId = Math.random().toString(36).slice(2);
+
+    queueMicrotask(() => {
+      if (mounted) {
+        setUser(readStoredUser());
+      }
+    });
+
     const loadingTimeout = window.setTimeout(() => {
       if (mounted) {
         setIsLoading(false);
@@ -39,8 +72,21 @@ export function useUser() {
     }, 3000);
 
     // Fetch profile from Supabase
-    const fetchProfile = async (userId: string) => {
+    const fetchProfile = async (userId: string, token?: string) => {
       try {
+        if (token) {
+          const response = await fetch('/api/profile', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            return (data?.profile as ProfileRow | null) || null;
+          }
+        }
+
         const { supabase } = await import('@/lib/supabase');
         const { data, error } = await supabase
           .from('profiles')
@@ -76,7 +122,7 @@ export function useUser() {
           return null;
         }
         
-        return data || null;
+        return (data as ProfileRow | null) || null;
       } catch (err) {
         console.warn('Warning: Failed to fetch profile', err);
         return null;
@@ -117,7 +163,7 @@ export function useUser() {
         
         if (session && mounted) {
           const [profile, roleFromDb] = await Promise.all([
-            fetchProfile(session.user.id),
+            fetchProfile(session.user.id, session.access_token),
             fetchUserRole(session.user.id, session.access_token),
           ]);
           const u: UserProfile = {
@@ -157,12 +203,53 @@ export function useUser() {
 
     window.addEventListener('profile-updated', handleProfileUpdated as EventListener);
 
+    const subscribeToProfile = async (supabase: SupabaseBrowserClient, session: Session) => {
+      if (!session?.user?.id) return;
+
+      if (channel) {
+        await supabase.removeChannel(channel);
+        channel = null;
+      }
+
+      channel = supabase
+        .channel(`profile:${session.user.id}:${channelInstanceId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'profiles',
+            filter: `id=eq.${session.user.id}`,
+          },
+          (payload) => {
+            if (payload.new && mounted) {
+              const updatedProfile = payload.new as ProfileRow;
+              const updatedUser: UserProfile = {
+                id: session.user.id,
+                name: updatedProfile.name || resolveUserName(session.user),
+                email: session.user.email,
+                phone: updatedProfile.phone,
+                location: updatedProfile.location,
+                role: updatedProfile.role,
+                bio: updatedProfile.bio,
+                created_at: updatedProfile.created_at,
+                updated_at: updatedProfile.updated_at,
+              };
+              localStorage.setItem('user', JSON.stringify(updatedUser));
+              setUser(updatedUser);
+            }
+          }
+        )
+        .subscribe();
+    };
+
     // Listen to changes (login, logout, token refresh, email confirm)
     import('@/lib/supabase').then(({ supabase }) => {
+      supabaseClient = supabase;
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-        if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && mounted) {
+        if ((event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session && mounted) {
           const [profile, roleFromDb] = await Promise.all([
-            fetchProfile(session.user.id),
+            fetchProfile(session.user.id, session.access_token),
             fetchUserRole(session.user.id, session.access_token),
           ]);
           const u: UserProfile = {
@@ -178,44 +265,7 @@ export function useUser() {
           };
           localStorage.setItem('user', JSON.stringify(u));
           setUser(u);
-          
-          // Subscribe to realtime updates on profiles table
-          if (session.user.id) {
-            if (channel) {
-              await supabase.removeChannel(channel);
-            }
-
-            channel = supabase
-              .channel(`profile:${session.user.id}`)
-              .on(
-                'postgres_changes',
-                {
-                  event: '*',
-                  schema: 'public',
-                  table: 'profiles',
-                  filter: `id=eq.${session.user.id}`,
-                },
-                (payload) => {
-                  if (payload.new && mounted) {
-                    const updatedProfile = payload.new as any;
-                    const updatedUser: UserProfile = {
-                      id: session.user.id,
-                      name: updatedProfile.name || resolveUserName(session.user),
-                      email: session.user.email,
-                      phone: updatedProfile.phone,
-                      location: updatedProfile.location,
-                      role: updatedProfile.role,
-                      bio: updatedProfile.bio,
-                      created_at: updatedProfile.created_at,
-                      updated_at: updatedProfile.updated_at,
-                    };
-                    localStorage.setItem('user', JSON.stringify(updatedUser));
-                    setUser(updatedUser);
-                  }
-                }
-              )
-              .subscribe();
-          }
+          await subscribeToProfile(supabase, session);
         } else if (event === 'SIGNED_OUT' && mounted) {
           setUser(null);
           localStorage.removeItem('user');
@@ -226,15 +276,17 @@ export function useUser() {
         }
       });
 
-      return () => {
-        subscription.unsubscribe();
-      };
+      authSubscription = subscription;
     });
 
     return () => {
       mounted = false;
       window.clearTimeout(loadingTimeout);
       window.removeEventListener('profile-updated', handleProfileUpdated as EventListener);
+      authSubscription?.unsubscribe();
+      if (channel && supabaseClient) {
+        supabaseClient.removeChannel(channel);
+      }
     };
   }, []);
 

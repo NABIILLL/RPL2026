@@ -3,26 +3,26 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { clearUser } from "@/lib/auth";
 import { useUser } from "@/hooks/useUser";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import { supabase } from "@/lib/supabase";
 import { toast } from "react-hot-toast";
 
 // Logo and profile images
-const imgLogo = "https://www.figma.com/api/mcp/asset/2a7fcedd-9f30-4d90-8e58-295d41707608";
-const imgProfile = "https://www.figma.com/api/mcp/asset/6e3b48fa-6d46-4818-a4c8-3a548e391ebd";
+const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
+const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
 
 // Growth tracker cards images
-const imgSawahBelakangKampus = "https://www.figma.com/api/mcp/asset/be7f6f1b-e0e9-42d0-9a7d-5a38770648c0";
-const imgJagungRezon = "https://www.figma.com/api/mcp/asset/156c8b0c-1b46-4d12-96c6-d779d2553252";
-const imgPadiPraktikum = "https://www.figma.com/api/mcp/asset/661ee958-6deb-464c-b320-6b78477a3c66";
+const imgSawahBelakangKampus = "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop";
+const imgJagungRezon = "https://images.unsplash.com/photo-1599940824399-b87987ceb72a?q=80&w=800&auto=format&fit=crop";
+const imgPadiPraktikum = "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=800&auto=format&fit=crop";
 
 // Result page images
-const imgRice2 = "https://www.figma.com/api/mcp/asset/4a93ea06-574f-4e48-adb5-27b4d06d8288";
-const imgResultField = "https://www.figma.com/api/mcp/asset/4a93ea06-574f-4e48-adb5-27b4d06d8288";
-const imgPlantSheaf = "https://www.figma.com/api/mcp/asset/692cc31f-379d-4deb-9cc0-25c87e666058";
-const imgResultLogo = "https://www.figma.com/api/mcp/asset/2a7fcedd-9f30-4d90-8e58-295d41707608";
-const imgResultProfile = "https://www.figma.com/api/mcp/asset/6e3b48fa-6d46-4818-a4c8-3a548e391ebd";
+const imgRice2 = "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?q=80&w=800&auto=format&fit=crop";
+const imgResultField = "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?q=80&w=800&auto=format&fit=crop";
+const imgPlantSheaf = "https://api.iconify.design/lucide:wheat.svg?color=%23365a1a";
+const imgResultLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
+const imgResultProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
 
 const cropCards = [
   {
@@ -68,16 +68,7 @@ export default function Dashboard() {
       router.replace("/admin");
     }
   }, [user, isLoading, router]);
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      clearUser();
-      router.push("/");
-    } catch (error) {
-      console.error("Failed to logout:", error);
-    }
-  };
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
 
   const handleCreateTracker = (e: React.FormEvent) => {
     e.preventDefault();
@@ -241,9 +232,10 @@ export default function Dashboard() {
               </Link>
               <button
                 onClick={handleLogout}
+                disabled={isLoggingOut}
                 className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
               >
-                Logout
+                {isLoggingOut ? "Keluar..." : "Logout"}
               </button>
             </div>
           </header>
@@ -360,10 +352,11 @@ export default function Dashboard() {
             </Link>
             <button
               onClick={handleLogout}
+              disabled={isLoggingOut}
               className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
             >
-              Logout
-            </button>
+                {isLoggingOut ? "Keluar..." : "Logout"}
+              </button>
           </div>
         </header>
 
@@ -485,10 +478,11 @@ export default function Dashboard() {
           </Link>
           <button
             onClick={handleLogout}
+            disabled={isLoggingOut}
             className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
           >
-            Logout
-          </button>
+                {isLoggingOut ? "Keluar..." : "Logout"}
+              </button>
         </div>
       </header>
 

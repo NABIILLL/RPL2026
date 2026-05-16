@@ -2,19 +2,18 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import { supabase } from "@/lib/supabase";
-import { clearUser } from "@/lib/auth";
 import { toast } from "react-hot-toast";
 import { Trash2 } from "lucide-react";
 
-const imgRice2 = "https://www.figma.com/api/mcp/asset/2d7af9f5-776e-41f7-851d-32ef06f4449b";
-const imgDownload41 = "https://www.figma.com/api/mcp/asset/d97cf4c8-1d28-42b7-b2d3-6398d7fe15a0";
-const imgPadiPraktikum = "https://www.figma.com/api/mcp/asset/f5e4867b-98ce-4c79-8726-44f31b684eb1";
-const imgOverviewImage = "https://www.figma.com/api/mcp/asset/c54148b2-7c65-4659-a5fa-527677b9aead";
-const imgLogo = "https://www.figma.com/api/mcp/asset/90530aab-9c02-498f-97a0-e57018497d3e";
-const imgProfile = "https://www.figma.com/api/mcp/asset/03caec6e-0209-4de6-a510-5e7ebeb6fffd";
+const imgRice2 = "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?q=80&w=800&auto=format&fit=crop";
+const imgDownload41 = "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=800&auto=format&fit=crop";
+const imgPadiPraktikum = "https://images.unsplash.com/photo-1628151015968-3a4429e9ef04?q=80&w=800&auto=format&fit=crop";
+const imgOverviewImage = "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=800&auto=format&fit=crop";
+const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
+const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
 
 const plantImages: { [key: string]: string } = {
   padi: imgRice2,
@@ -24,21 +23,11 @@ const plantImages: { [key: string]: string } = {
 
 export default function Overviews() {
   const { user, isLoading } = useUser();
-  const router = useRouter();
   const [trackers, setTrackers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
   const displayName = !isLoading && user ? user.name : "Guest";
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      clearUser();
-      router.push("/");
-    } catch (error) {
-      console.error("Failed to logout:", error);
-    }
-  };
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
 
   useEffect(() => {
     if (isLoading || !user) {
@@ -141,7 +130,7 @@ export default function Overviews() {
                 onClick={handleLogout}
                 className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
               >
-                Logout
+                {isLoggingOut ? "Keluar..." : "Logout"}
               </button>
             </div>
           ) : (

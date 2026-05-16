@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import {
   Droplets,
   Eye,
@@ -18,15 +17,14 @@ import {
 
 import { useWeather } from "@/hooks/useWeather";
 import { useUser } from "@/hooks/useUser";
-import { clearUser } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import { getWeatherDescription } from "@/lib/weather";
 
-const imgRainHero = "https://www.figma.com/api/mcp/asset/2002dfd6-9832-40e4-9d01-b6bf12dbbc0c";
-const imgBrandLogo = "https://www.figma.com/api/mcp/asset/e9b658e8-3ead-47e3-b268-5f096d5ade3d";
-const imgProfileAvatar = "https://www.figma.com/api/mcp/asset/1dc6554e-4411-4918-9fc0-01d6afffe58d";
-const imgCloudyIcon = "https://www.figma.com/api/mcp/asset/253027de-de40-4f4c-99c1-0c99edc84b39";
-const imgRainIcon = "https://www.figma.com/api/mcp/asset/4f68d557-5a73-4df1-a7ab-8d6f095f337d";
+const imgRainHero = "https://images.unsplash.com/photo-1515694346937-94d85e41e6f0?q=80&w=2000&auto=format&fit=crop";
+const imgBrandLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
+const imgProfileAvatar = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
+const imgCloudyIcon = "https://api.iconify.design/lucide:cloud.svg?color=%23365a1a";
+const imgRainIcon = "https://api.iconify.design/lucide:cloud-rain.svg?color=%23365a1a";
 
 const DEFAULT_LAT = -6.5951;
 const DEFAULT_LON = 106.8063;
@@ -83,7 +81,7 @@ function getWeatherAccent(code: number) {
 
 export default function WeatherInfo() {
   const { user, isLoading } = useUser();
-  const router = useRouter();
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
   const [latitude, setLatitude] = useState(DEFAULT_LAT);
   const [longitude, setLongitude] = useState(DEFAULT_LON);
   const [locationName, setLocationName] = useState(DEFAULT_LOCATION);
@@ -126,16 +124,6 @@ export default function WeatherInfo() {
     : current
     ? `${current.condition}. ${current.temperature}°C`
     : "Memuat cuaca...";
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      clearUser();
-      router.push("/");
-    } catch (logoutError) {
-      console.error("Failed to logout:", logoutError);
-    }
-  };
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -256,7 +244,7 @@ export default function WeatherInfo() {
                 onClick={handleLogout}
                 className="text-sm font-bold text-[#365a1a] transition hover:opacity-80"
               >
-                Logout
+                {isLoggingOut ? "Keluar..." : "Logout"}
               </button>
             </div>
           ) : (

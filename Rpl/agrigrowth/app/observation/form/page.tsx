@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useUser } from "@/hooks/useUser";
+import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import { toast } from "react-hot-toast";
 
-const imgLogo = "https://www.figma.com/api/mcp/asset/1ec87735-8093-48cd-bfb5-5836d3ed91fd";
+const imgLogo = "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=800&auto=format&fit=crop";
+const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
 
 interface FormData {
   trackerSelect: string;
@@ -33,6 +35,7 @@ interface TrackerData {
 export default function ObservationForm() {
   const router = useRouter();
   const { user, isLoading: userLoading } = useUser();
+  const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
   
   const [formData, setFormData] = useState<FormData>({
     trackerSelect: "",
@@ -257,6 +260,18 @@ export default function ObservationForm() {
             Features
           </Link>
         </nav>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/profile"
+            className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
+          >
+            <span>{user.name}</span>
+            <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+          </Link>
+          <button onClick={handleLogout} disabled={isLoggingOut} className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
+            {isLoggingOut ? "Keluar..." : "Logout"}
+          </button>
+        </div>
       </header>
 
       {/* Form Content */}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabase';
@@ -12,106 +12,240 @@ interface ProfileEditorProps {
   onClose: () => void;
 }
 
+type ProfileForm = Partial<UserProfile>;
+type FieldErrors = Partial<Record<'name' | 'phone' | 'location' | 'role' | 'bio', string>>;
+
+const allowedRoles = new Set(['Petani', 'Agronomist', 'Peneliti', 'Penyuluh', 'Mahasiswa']);
+const blockedBioWords = /\b(damn|anjing|bangsat|kontol|memek|tolol|goblok)\b/i;
+
+const normalizeIndonesianPhone = (rawValue?: string | null) => {
+  const raw = rawValue?.trim() || '';
+  if (!raw) return { value: '', error: '' };
+
+  const compact = raw.replace(/[\s().-]/g, '');
+  let normalized = compact;
+
+  if (normalized.startsWith('08')) {
+    normalized = `+62${normalized.slice(1)}`;
+  } else if (normalized.startsWith('628')) {
+    normalized = `+${normalized}`;
+  } else if (normalized.startsWith('8')) {
+    normalized = `+62${normalized}`;
+  } else if (normalized.startsWith('+6208')) {
+    normalized = `+62${normalized.slice(4)}`;
+  }
+
+  if (!/^\+628\d{8,11}$/.test(normalized)) {
+    return {
+      value: normalized,
+      error: 'Format telepon harus nomor HP Indonesia, contoh 081234567890 atau +6281234567890.',
+    };
+  }
+
+  return { value: normalized, error: '' };
+};
+
+const validateProfileForm = (formData: ProfileForm) => {
+  const errors: FieldErrors = {};
+  const name = formData.name?.trim() || '';
+  const phone = normalizeIndonesianPhone(formData.phone);
+  const location = formData.location?.trim() || '';
+  const role = formData.role?.trim() || '';
+  const bio = formData.bio?.trim() || '';
+
+  if (!name) {
+    errors.name = 'Nama tidak boleh kosong.';
+  } else if (name.length < 2) {
+    errors.name = 'Nama minimal 2 karakter.';
+  } else if (!/^[A-Za-zÀ-ÿ\s'.-]+$/.test(name)) {
+    errors.name = 'Nama hanya boleh berisi huruf, spasi, titik, petik, atau tanda hubung.';
+  }
+
+  if (phone.error) {
+    errors.phone = phone.error;
+  }
+
+  if (location && location.length < 2) {
+    errors.location = 'Lokasi minimal 2 karakter.';
+  }
+
+  if (role && !allowedRoles.has(role)) {
+    errors.role = 'Pilih peran dari daftar yang tersedia.';
+  }
+
+  if (bio) {
+    if (bio.length < 10) {
+      errors.bio = 'Bio minimal 10 karakter atau kosongkan saja.';
+    } else if (bio.length > 200) {
+      errors.bio = 'Bio maksimal 200 karakter.';
+    } else if (blockedBioWords.test(bio)) {
+      errors.bio = 'Bio tidak boleh berisi kata kasar.';
+    }
+  }
+
+  return { errors, phone };
+};
+
+const firstError = (errors: FieldErrors) => Object.values(errors).find(Boolean) || '';
+
+const saveProfile = async (token: string, payload: Partial<UserProfile>) => {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 7000);
+
+  try {
+    const response = await fetch('/api/profile', {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(result?.error || `Request failed (${response.status})`);
+    }
+
+    return result?.profile as Partial<UserProfile>;
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new Error('Menyimpan terlalu lama. Cek koneksi/Supabase lalu coba lagi.');
+    }
+
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+};
+
 export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorProps) {
-  const [formData, setFormData] = useState<Partial<UserProfile>>({
-    name: '',
-    phone: '',
-    location: '',
-    role: '',
-    bio: '',
+  const [formData, setFormData] = useState<ProfileForm>({
+    name: user?.name || '',
+    phone: user?.phone || '',
+    location: user?.location || '',
+    role: user?.role || '',
+    bio: user?.bio || '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  // Initialize form with user data
-  useEffect(() => {
-    if (user) {
-      setFormData({
-        name: user.name || '',
-        phone: user.phone || '',
-        location: user.location || '',
-        role: user.role || '',
-        bio: user.bio || '',
-      });
-    }
-  }, [user, isOpen]);
+  const currentValidation = validateProfileForm(formData);
+  const hasValidationError = Boolean(firstError(currentValidation.errors));
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    const nextValue = name === 'phone' ? normalizeIndonesianPhone(value).value : value;
+    if (name === 'phone') {
+      setFormError('');
+    }
+
+    const nextForm = {
+      ...formData,
+      [name]: nextValue,
+    };
+
+    setFormData(nextForm);
+    setFieldErrors(validateProfileForm(nextForm).errors);
+    if (formError) {
+      setFormError('');
+    }
+  };
+
+  const errorFor = (field: keyof FieldErrors) => fieldErrors[field];
+
+  const inputClassName = (field: keyof FieldErrors) =>
+    `mt-2 w-full rounded-lg border bg-white px-4 py-2.5 text-[14px] text-[#365a1a] placeholder-[#c0c5ba] transition focus:outline-none focus:ring-2 disabled:opacity-50 ${
+      errorFor(field)
+        ? 'border-red-300 focus:border-red-400 focus:ring-red-100'
+        : 'border-[#e0e5da] focus:border-[#6aa439] focus:ring-[#6aa439]/20'
+    }`;
+
+  const errorText = (field: keyof FieldErrors) => {
+    const error = errorFor(field);
+    if (!error) return null;
+
+    return <p className="mt-1 text-[11px] text-red-600">{error}</p>;
+  };
+
+  const setSafeFormData = (nextData: ProfileForm) => {
     setFormData((prev) => ({
       ...prev,
-      [name]: value,
+      ...nextData,
     }));
   };
 
-  // Save profile to Supabase
+  // Save profile through the local API so the client request can be aborted cleanly.
   const handleSave = async () => {
+    let watchdog: ReturnType<typeof setTimeout> | null = null;
+
     if (!user?.id) {
       toast.error('User ID tidak ditemukan');
       return;
     }
 
-    if (!formData.name?.trim()) {
-      toast.error('Nama tidak boleh kosong');
+    const { errors, phone } = validateProfileForm(formData);
+    const message = firstError(errors);
+    setFieldErrors(errors);
+    if (message) {
+      setFormError(message);
+      toast.error(message);
       return;
     }
 
     setIsSubmitting(true);
+    setFormError('');
+    watchdog = setTimeout(() => {
+      const message = 'Menyimpan terlalu lama. Cek koneksi/Supabase lalu coba lagi.';
+      setIsSubmitting(false);
+      setFormError(message);
+      toast.error(message);
+    }, 9000);
+
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .upsert(
-          {
-            id: user.id,
-            name: formData.name?.trim(),
-            phone: formData.phone?.trim(),
-            location: formData.location?.trim(),
-            role: formData.role?.trim(),
-            bio: formData.bio?.trim(),
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'id' }
-        )
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error saving profile:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-        });
-
-        if (error.code === '42501' || /permission denied/i.test(error.message || '')) {
-          toast.error('Supabase belum mengizinkan edit profile. Cek RLS policy pada tabel profiles.');
-        } else {
-          toast.error(`Gagal menyimpan profil: ${error.message || 'unknown'}`);
-        }
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || sessionData.session?.user.id !== user.id || !sessionData.session.access_token) {
+        toast.error('Sesi login tidak ditemukan. Silakan login ulang.');
         return;
       }
 
+      const profile = await saveProfile(sessionData.session.access_token, {
+        name: formData.name?.trim(),
+        phone: phone.value || undefined,
+        location: formData.location?.trim() || undefined,
+        role: formData.role?.trim() || undefined,
+        bio: formData.bio?.trim() || undefined,
+      });
+
       const updatedUser: UserProfile = {
         id: user.id,
-        name: data?.name || formData.name?.trim() || user.name,
+        name: profile?.name || formData.name?.trim() || user.name,
         email: user.email,
-        phone: data?.phone || formData.phone?.trim(),
-        location: data?.location || formData.location?.trim(),
-        role: data?.role || formData.role?.trim(),
-        bio: data?.bio || formData.bio?.trim(),
-        created_at: data?.created_at || user.created_at,
-        updated_at: data?.updated_at || new Date().toISOString(),
+        phone: profile?.phone || phone.value,
+        location: profile?.location || formData.location?.trim(),
+        role: profile?.role || formData.role?.trim() || user.role,
+        bio: profile?.bio || formData.bio?.trim(),
+        created_at: profile?.created_at || user.created_at,
+        updated_at: profile?.updated_at || new Date().toISOString(),
       };
 
       localStorage.setItem('user', JSON.stringify(updatedUser));
       window.dispatchEvent(new CustomEvent('profile-updated', { detail: updatedUser }));
+      setSafeFormData({ phone: phone.value });
 
       toast.success('Profil berhasil disimpan');
       onClose();
-    } catch (err: any) {
-      console.error('Error saving profile:', err);
-      toast.error(`Gagal menyimpan profil: ${err?.message ?? 'unknown'}`);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'unknown';
+      setFormError(message);
+      toast.error(`Gagal menyimpan profil: ${message}`);
     } finally {
+      if (watchdog) {
+        clearTimeout(watchdog);
+      }
       setIsSubmitting(false);
     }
   };
@@ -148,8 +282,9 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
               onChange={handleChange}
               placeholder="Masukkan nama lengkap"
               disabled={isSubmitting}
-              className="mt-2 w-full rounded-lg border border-[#e0e5da] bg-white px-4 py-2.5 text-[14px] text-[#365a1a] placeholder-[#c0c5ba] transition focus:border-[#6aa439] focus:outline-none focus:ring-2 focus:ring-[#6aa439]/20 disabled:opacity-50"
+              className={inputClassName('name')}
             />
+            {errorText('name')}
           </div>
 
           {/* Phone */}
@@ -164,8 +299,10 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
               onChange={handleChange}
               placeholder="+62 812-3456-789"
               disabled={isSubmitting}
-              className="mt-2 w-full rounded-lg border border-[#e0e5da] bg-white px-4 py-2.5 text-[14px] text-[#365a1a] placeholder-[#c0c5ba] transition focus:border-[#6aa439] focus:outline-none focus:ring-2 focus:ring-[#6aa439]/20 disabled:opacity-50"
+              className={inputClassName('phone')}
             />
+            <p className="mt-1 text-[11px] text-[#6a7f55]">Nomor 08... otomatis disimpan sebagai +62...</p>
+            {errorText('phone')}
           </div>
 
           {/* Location */}
@@ -180,8 +317,9 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
               onChange={handleChange}
               placeholder="Kota, Provinsi"
               disabled={isSubmitting}
-              className="mt-2 w-full rounded-lg border border-[#e0e5da] bg-white px-4 py-2.5 text-[14px] text-[#365a1a] placeholder-[#c0c5ba] transition focus:border-[#6aa439] focus:outline-none focus:ring-2 focus:ring-[#6aa439]/20 disabled:opacity-50"
+              className={inputClassName('location')}
             />
+            {errorText('location')}
           </div>
 
           {/* Role */}
@@ -194,7 +332,7 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
               value={formData.role || ''}
               onChange={handleChange}
               disabled={isSubmitting}
-              className="mt-2 w-full rounded-lg border border-[#e0e5da] bg-white px-4 py-2.5 text-[14px] text-[#365a1a] transition focus:border-[#6aa439] focus:outline-none focus:ring-2 focus:ring-[#6aa439]/20 disabled:opacity-50"
+              className={inputClassName('role')}
             >
               <option value="">Pilih peran...</option>
               <option value="Petani">Petani</option>
@@ -203,6 +341,7 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
               <option value="Penyuluh">Penyuluh</option>
               <option value="Mahasiswa">Mahasiswa</option>
             </select>
+            {errorText('role')}
           </div>
 
           {/* Bio */}
@@ -217,10 +356,17 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
               placeholder="Ceritakan tentang Anda..."
               disabled={isSubmitting}
               rows={3}
-              className="mt-2 w-full rounded-lg border border-[#e0e5da] bg-white px-4 py-2.5 text-[14px] text-[#365a1a] placeholder-[#c0c5ba] transition focus:border-[#6aa439] focus:outline-none focus:ring-2 focus:ring-[#6aa439]/20 disabled:opacity-50"
+              className={inputClassName('bio')}
             />
+            {errorText('bio')}
           </div>
         </div>
+
+        {formError && (
+          <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-[13px] text-red-700">
+            {formError}
+          </div>
+        )}
 
         {/* Buttons */}
         <div className="mt-6 flex gap-3">
@@ -233,7 +379,7 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
           </button>
           <button
             onClick={handleSave}
-            disabled={isSubmitting}
+            disabled={isSubmitting || hasValidationError}
             className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg bg-[#6aa439] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#5a9429] disabled:opacity-50"
           >
             {isSubmitting ? (
