@@ -21,7 +21,7 @@ export default function About() {
       {/* Header */}
       <header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
         <div className="flex items-center gap-2.5">
-          <img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
+          <img alt="Agrigrowth logo" loading="lazy" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
           <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
         </div>
 
@@ -45,7 +45,7 @@ export default function About() {
                 className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
               >
                 <span>{user.name}</span>
-                <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+                <img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgProfile} />
               </Link>
               <button onClick={handleLogout} disabled={isLoggingOut} className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
                 {isLoggingOut ? "Keluar..." : "Logout"}

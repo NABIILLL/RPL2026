@@ -54,20 +54,22 @@ export default function Dashboard() {
   const { user, isLoading } = useUser();
   const router = useRouter();
   const displayName = !isLoading && user ? user.name : "Guest";
+  const userId = user?.id;
+  const userRole = user?.role;
 
   // Block direct access when there is no active Supabase session.
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (!isLoading && !userId) {
       router.replace("/");
     }
-  }, [isLoading, user, router]);
+  }, [isLoading, userId, router]);
 
   // Redirect admins to the admin dashboard
   useEffect(() => {
-    if (!isLoading && user?.role === "admin") {
+    if (!isLoading && userRole === "admin") {
       router.replace("/admin");
     }
-  }, [user, isLoading, router]);
+  }, [userRole, isLoading, router]);
   const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
 
   const handleCreateTracker = (e: React.FormEvent) => {
@@ -206,7 +208,7 @@ export default function Dashboard() {
         <div className="mx-auto min-h-screen w-full max-w-[1440px] bg-white px-5 pb-10 pt-6 sm:px-10 lg:px-14">
           <header className="relative z-50 flex items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
-              <img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgResultLogo} />
+              <img alt="Agrigrowth logo" loading="lazy" className="h-[51px] w-[59px] object-contain" src={imgResultLogo} />
               <b className="text-[16px] leading-none sm:text-[18px] lg:text-[21px]">Agrigrowth Monitor</b>
             </div>
 
@@ -228,7 +230,7 @@ export default function Dashboard() {
                 className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[14px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[16px] lg:text-[18px]"
               >
                 <span>{displayName}</span>
-                <img alt="Profile" className="h-8 w-8 object-contain" src={imgResultProfile} />
+                <img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgResultProfile} />
               </Link>
               <button
                 onClick={handleLogout}
@@ -248,13 +250,13 @@ export default function Dashboard() {
             <div className="rounded-[28px] border-[3px] border-[rgba(54,90,26,0.75)] p-4 sm:rounded-[35px] sm:p-5">
               <div className="text-center text-[22px] font-bold sm:text-[26px]">Jenis tanaman</div>
               <div className="mt-2 flex justify-center">
-                <img alt="Plant icon" className="h-[128px] w-[128px] object-contain sm:h-[140px] sm:w-[140px]" src={imgPlantSheaf} />
+                <img alt="Plant icon" loading="lazy" className="h-[128px] w-[128px] object-contain sm:h-[140px] sm:w-[140px]" src={imgPlantSheaf} />
               </div>
               <div className="text-center text-[22px] font-bold sm:text-[26px]">{activePlantLabel}</div>
             </div>
 
             <div className="overflow-hidden rounded-[28px] sm:rounded-[35px]">
-              <img alt="Rice field" className="h-[170px] w-full object-cover sm:h-[190px] lg:h-[212px]" src={imgResultField} />
+              <img alt="Rice field" loading="lazy" className="h-[170px] w-full object-cover sm:h-[190px] lg:h-[212px]" src={imgResultField} />
             </div>
           </section>
 
@@ -326,7 +328,7 @@ export default function Dashboard() {
       <main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
         <header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
           <div className="flex items-center gap-2.5">
-            <img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
+            <img alt="Agrigrowth logo" loading="lazy" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
             <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
           </div>
 
@@ -348,7 +350,7 @@ export default function Dashboard() {
               className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
             >
               <span>{displayName}</span>
-              <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+                <img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgProfile} />
             </Link>
             <button
               onClick={handleLogout}
@@ -452,7 +454,7 @@ export default function Dashboard() {
     <main className="min-h-screen bg-[#f4f4f4] text-[#365a1a]">
       <header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
         <div className="flex items-center gap-2.5">
-          <img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
+          <img alt="Agrigrowth logo" loading="lazy" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
           <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
         </div>
 
@@ -474,7 +476,7 @@ export default function Dashboard() {
             className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
           >
             <span>{displayName}</span>
-            <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+            <img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgProfile} />
           </Link>
           <button
             onClick={handleLogout}
@@ -500,7 +502,7 @@ export default function Dashboard() {
                 href={`/observation/${card.id}/history`}
                 className="group relative h-[360px] overflow-hidden rounded-[16px] shadow-[-6px_6px_12px_rgba(0,0,0,0.3)] transition hover:shadow-[-6px_6px_20px_rgba(0,0,0,0.5)] sm:h-[396px]"
               >
-                <img alt={card.title} className="h-full w-full object-cover transition group-hover:scale-105" src={card.image} />
+                <img alt={card.title} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-105" src={card.image} />
                 <div className="absolute inset-x-0 bottom-0 h-[32%] bg-gradient-to-t from-[#365a1a] to-transparent transition group-hover:h-[40%]" />
                 <p className="absolute inset-x-0 bottom-3 text-center text-[18px] font-extrabold text-white transition group-hover:bottom-4">
                   {card.title}

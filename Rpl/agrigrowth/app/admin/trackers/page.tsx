@@ -23,13 +23,29 @@ export default function AdminTrackersPage() {
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ ...emptyForm });
   const [editingId, setEditingId] = useState<string | null>(null);
+  
+  const [profileMap, setProfileMap] = useState<Map<string, string>>(new Map());
 
   const loadTrackers = async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await adminFetch("/api/admin/trackers");
-      setTrackers(data.trackers || []);
+      const [trackerData, userData] = await Promise.all([
+        adminFetch("/api/admin/trackers"),
+        adminFetch("/api/admin/users")
+      ]);
+      setTrackers(trackerData.trackers || []);
+
+      const profiles = userData.profiles || [];
+      const users = userData.users || [];
+      const newProfileMap = new Map<string, string>();
+      
+      users.forEach((u: any) => {
+         const p = profiles.find((p: any) => p.id === u.id);
+         newProfileMap.set(u.id, p?.name || u.user_metadata?.name || u.email || "User");
+      });
+      setProfileMap(newProfileMap);
+
     } catch (err: any) {
       setError(err?.message || "Gagal memuat tracker");
     } finally {
@@ -150,6 +166,7 @@ export default function AdminTrackersPage() {
           <table>
             <thead>
               <tr>
+                <th>User</th>
                 <th>Tracker</th>
                 <th>User ID</th>
                 <th>Jenis Tanaman</th>
@@ -163,18 +180,27 @@ export default function AdminTrackersPage() {
               ) : trackers.length === 0 ? (
                 <tr><td colSpan={5}>Belum ada tracker</td></tr>
               ) : (
-                trackers.map((tracker) => (
-                  <tr key={tracker.id}>
-                    <td>{tracker.title}</td>
-                    <td style={{ color: "var(--text4)" }}>{tracker.user_id}</td>
-                    <td>{tracker.plant_type || "-"}</td>
-                    <td style={{ color: "var(--text4)" }}>{tracker.created_at?.split("T")[0] || "-"}</td>
-                    <td>
-                      <button className="mini-btn" onClick={() => handleEdit(tracker)}>Edit</button>
-                      <button className="mini-btn" style={{ marginLeft: 6 }} onClick={() => handleDelete(tracker.id)}>Hapus</button>
-                    </td>
-                  </tr>
-                ))
+                trackers.map((tracker) => {
+                  const userName = profileMap.get(tracker.user_id) || "Unknown";
+                  return (
+                    <tr key={tracker.id}>
+                      <td style={{ fontWeight: 600 }}>
+                        <div className="td-name">
+                          <div className="avatar-sm" style={{ width: 24, height: 24, fontSize: 10 }}>{userName?.slice(0, 2).toUpperCase() || "?"}</div>
+                          {userName}
+                        </div>
+                      </td>
+                      <td>{tracker.title}</td>
+                      <td style={{ color: "var(--text4)", fontSize: "12px" }}>{tracker.user_id.slice(0, 8)}...</td>
+                      <td>{tracker.plant_type || "-"}</td>
+                      <td style={{ color: "var(--text4)" }}>{tracker.created_at?.split("T")[0] || "-"}</td>
+                      <td>
+                        <button className="mini-btn" onClick={() => handleEdit(tracker)}>Edit</button>
+                        <button className="mini-btn" style={{ marginLeft: 6 }} onClick={() => handleDelete(tracker.id)}>Hapus</button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>

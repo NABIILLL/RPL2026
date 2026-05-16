@@ -3,24 +3,30 @@
 import { useEffect, useState } from "react";
 import { adminFetch } from "@/app/admin/_lib/adminApi";
 
-type Observation = {
+type ProductionCost = {
   id: string;
   tracker_id: string;
-  day_number: number;
-  plant_height?: number | null;
-  leaf_count?: number | null;
+  date: string;
+  category: string;
+  description?: string | null;
+  amount: number;
   created_at?: string | null;
 };
 
 const emptyForm = {
   tracker_id: "",
-  day_number: "",
-  plant_height: "",
-  leaf_count: "",
+  date: "",
+  category: "Bibit",
+  description: "",
+  amount: "",
 };
 
-export default function AdminObservationsPage() {
-  const [observations, setObservations] = useState<Observation[]>([]);
+const costCategories = [
+  "Bibit", "Pupuk", "Obat-obatan/Pestisida", "Tenaga Kerja", "Sewa Alat", "Transportasi", "Lain-lain"
+];
+
+export default function AdminCostsPage() {
+  const [costs, setCosts] = useState<ProductionCost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState({ ...emptyForm });
@@ -30,16 +36,16 @@ export default function AdminObservationsPage() {
   const [profileMap, setProfileMap] = useState<Map<string, string>>(new Map());
   const [trackerUserMap, setTrackerUserMap] = useState<Map<string, string>>(new Map());
 
-  const loadObservations = async () => {
+  const loadCosts = async () => {
     setLoading(true);
     setError(null);
     try {
-      const [observationData, userData, trackerData] = await Promise.all([
-        adminFetch("/api/admin/observations"),
+      const [costData, userData, trackerData] = await Promise.all([
+        adminFetch("/api/admin/costs"),
         adminFetch("/api/admin/users"),
         adminFetch("/api/admin/trackers")
       ]);
-      setObservations(observationData.observations || []);
+      setCosts(costData.costs || []);
 
       const profiles = userData.profiles || [];
       const users = userData.users || [];
@@ -59,19 +65,19 @@ export default function AdminObservationsPage() {
       setTrackerUserMap(newTrackerMap);
 
     } catch (err: any) {
-      setError(err?.message || "Gagal memuat observasi");
+      setError(err?.message || "Gagal memuat daftar biaya");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadObservations();
+    loadCosts();
   }, []);
 
   const handleSubmit = async () => {
-    if (!form.tracker_id || !form.day_number) {
-      setError("tracker_id dan day_number wajib diisi");
+    if (!form.tracker_id || !form.date || !form.category || !form.amount) {
+      setError("tracker_id, tanggal, kategori, dan jumlah biaya wajib diisi");
       return;
     }
 
@@ -79,61 +85,65 @@ export default function AdminObservationsPage() {
     try {
       const payload = {
         tracker_id: form.tracker_id,
-        day_number: Number(form.day_number),
-        plant_height: form.plant_height ? Number(form.plant_height) : null,
-        leaf_count: form.leaf_count ? Number(form.leaf_count) : null,
+        date: form.date,
+        category: form.category,
+        description: form.description || null,
+        amount: Number(form.amount),
       };
 
       if (editingId) {
-        await adminFetch("/api/admin/observations", {
+        await adminFetch("/api/admin/costs", {
           method: "PATCH",
           json: { id: editingId, ...payload },
         });
       } else {
-        await adminFetch("/api/admin/observations", {
+        await adminFetch("/api/admin/costs", {
           method: "POST",
           json: payload,
         });
       }
 
-      setForm({ ...emptyForm });
+      setForm({ ...emptyForm, date: form.date }); // keep the date for convenience
       setEditingId(null);
-      await loadObservations();
+      await loadCosts();
     } catch (err: any) {
-      setError(err?.message || "Gagal menyimpan observasi");
+      setError(err?.message || "Gagal menyimpan biaya");
     }
   };
 
-  const handleEdit = (item: Observation) => {
+  const handleEdit = (item: ProductionCost) => {
     setEditingId(item.id);
     setForm({
       tracker_id: item.tracker_id,
-      day_number: String(item.day_number),
-      plant_height: item.plant_height?.toString() || "",
-      leaf_count: item.leaf_count?.toString() || "",
+      date: item.date,
+      category: item.category,
+      description: item.description || "",
+      amount: String(item.amount),
     });
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Hapus observasi ini?")) return;
+    if (!confirm("Hapus biaya produksi ini?")) return;
     setError(null);
     try {
-      await adminFetch("/api/admin/observations", { method: "DELETE", json: { id } });
-      await loadObservations();
+      await adminFetch("/api/admin/costs", { method: "DELETE", json: { id } });
+      await loadCosts();
     } catch (err: any) {
-      setError(err?.message || "Gagal menghapus observasi");
+      setError(err?.message || "Gagal menghapus biaya");
     }
   };
+
+  const totalCost = costs.reduce((sum, cost) => sum + Number(cost.amount), 0);
 
   return (
     <>
       <div className="page-header">
         <div>
-          <div className="page-title">Kelola Observasi</div>
-          <div className="page-sub">Monitoring input data harian dan validasi data lapangan</div>
+          <div className="page-title">Kelola Biaya Produksi</div>
+          <div className="page-sub">Monitoring input biaya produksi untuk seluruh tracker</div>
         </div>
         <div className="header-actions">
-          <button className="btn btn-ghost" onClick={() => setForm({ ...emptyForm })}><i className="ti ti-refresh"></i> Reset</button>
+          <button className="btn btn-ghost" onClick={() => { setForm({ ...emptyForm }); setEditingId(null); }}><i className="ti ti-refresh"></i> Reset Form</button>
           <button className="btn btn-primary" onClick={handleSubmit}><i className="ti ti-device-floppy"></i> Simpan</button>
         </div>
       </div>
@@ -147,30 +157,41 @@ export default function AdminObservationsPage() {
       <div className="grid-equal" style={{ marginBottom: 14 }}>
         <div className="panel">
           <div className="panel-header">
-            <div className="panel-title"><i className="ti ti-notes"></i> Ringkasan Observasi</div>
+            <div className="panel-title"><i className="ti ti-wallet"></i> Ringkasan Biaya Keseluruhan</div>
           </div>
           <div className="stat-inline">
-            <div className="stat-cell"><div className="stat-cell-num">{observations.length}</div><div className="stat-cell-lbl">Total</div></div>
+            <div className="stat-cell">
+              <div className="stat-cell-num">{costs.length}</div>
+              <div className="stat-cell-lbl">Total Entri Data</div>
+            </div>
+            <div className="stat-cell">
+              <div className="stat-cell-num" style={{ color: "var(--green)" }}>Rp {totalCost.toLocaleString('id-ID')}</div>
+              <div className="stat-cell-lbl">Total Nilai Biaya</div>
+            </div>
           </div>
         </div>
+        
         <div className="panel">
           <div className="panel-header">
-            <div className="panel-title"><i className="ti ti-edit"></i> Form Observasi</div>
+            <div className="panel-title"><i className="ti ti-edit"></i> Form Biaya Produksi</div>
           </div>
           <div style={{ padding: "14px 16px", display: "grid", gap: 10 }}>
-            <input className="form-input" placeholder="tracker_id" value={form.tracker_id} onChange={(e) => setForm({ ...form, tracker_id: e.target.value })} />
-            <input className="form-input" placeholder="Hari ke" value={form.day_number} onChange={(e) => setForm({ ...form, day_number: e.target.value })} />
-            <input className="form-input" placeholder="Tinggi tanaman" value={form.plant_height} onChange={(e) => setForm({ ...form, plant_height: e.target.value })} />
-            <input className="form-input" placeholder="Jumlah daun" value={form.leaf_count} onChange={(e) => setForm({ ...form, leaf_count: e.target.value })} />
+            <input className="form-input" placeholder="ID Tracker" value={form.tracker_id} onChange={(e) => setForm({ ...form, tracker_id: e.target.value })} />
+            <input type="date" className="form-input" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+            <select className="form-input" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+              {costCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+            </select>
+            <input className="form-input" placeholder="Keterangan (opsional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            <input type="number" className="form-input" placeholder="Jumlah Biaya (Rp)" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
           </div>
         </div>
       </div>
 
       <div className="panel">
         <div className="panel-header">
-          <div className="panel-title"><i className="ti ti-list"></i> Daftar Observasi</div>
+          <div className="panel-title"><i className="ti ti-list"></i> Daftar Biaya Produksi</div>
           <div className="panel-actions">
-            <button className="mini-btn" onClick={loadObservations}>Refresh</button>
+            <button className="mini-btn" onClick={loadCosts}>Refresh</button>
           </div>
         </div>
         <div className="table-wrap">
@@ -179,20 +200,20 @@ export default function AdminObservationsPage() {
               <tr>
                 <th>User</th>
                 <th>Tracker ID</th>
-                <th>Hari Ke-</th>
-                <th>Tinggi</th>
-                <th>Daun</th>
-                <th>Waktu</th>
+                <th>Tanggal</th>
+                <th>Kategori</th>
+                <th>Keterangan</th>
+                <th>Jumlah (Rp)</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr><td colSpan={6}>Loading...</td></tr>
-              ) : observations.length === 0 ? (
+              ) : costs.length === 0 ? (
                 <tr><td colSpan={6}>Belum ada data</td></tr>
               ) : (
-                observations.map((item) => {
+                costs.map((item) => {
                   const userId = trackerUserMap.get(item.tracker_id);
                   const userName = userId ? profileMap.get(userId) : "Unknown";
                   return (
@@ -204,13 +225,13 @@ export default function AdminObservationsPage() {
                         </div>
                       </td>
                       <td style={{ color: "var(--text4)", fontSize: "12px" }}>{item.tracker_id.slice(0, 8)}...</td>
-                      <td>{item.day_number}</td>
-                      <td>{item.plant_height ?? "-"}</td>
-                      <td>{item.leaf_count ?? "-"}</td>
-                      <td style={{ color: "var(--text4)" }}>{item.created_at?.split("T")[0] || "-"}</td>
+                      <td>{new Date(item.date).toLocaleDateString('id-ID')}</td>
+                      <td><span className="badge" style={{ background: "var(--bg3)", color: "var(--text)", padding: "4px 8px" }}>{item.category}</span></td>
+                      <td style={{ color: "var(--text4)" }}>{item.description || "-"}</td>
+                      <td style={{ fontWeight: 600 }}>{Number(item.amount).toLocaleString('id-ID')}</td>
                       <td>
                         <button className="mini-btn" onClick={() => handleEdit(item)}>Edit</button>
-                        <button className="mini-btn" style={{ marginLeft: 6 }} onClick={() => handleDelete(item.id)}>Hapus</button>
+                        <button className="mini-btn" style={{ marginLeft: 6, color: "var(--red)" }} onClick={() => handleDelete(item.id)}>Hapus</button>
                       </td>
                     </tr>
                   );

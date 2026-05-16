@@ -43,6 +43,12 @@ export default function ObservationHistory() {
   const [loading, setLoading] = useState(true);
   const [editingLog, setEditingLog] = useState<any | null>(null);
   
+  // Cost Management State
+  const [activeTab, setActiveTab] = useState<"pengamatan" | "biaya">("pengamatan");
+  const [costs, setCosts] = useState<any[]>([]);
+  const [editingCost, setEditingCost] = useState<any | null>(null);
+  const [showCostForm, setShowCostForm] = useState(false);
+  
   // Analysis stats
   const [stats, setStats] = useState({
     startHeight: 0,
@@ -53,11 +59,12 @@ export default function ObservationHistory() {
     avgHeightGrowth: 0,
     avgLeafGrowth: 0
   });
+  const userId = user?.id;
 
   // Fetch list of trackers first
   useEffect(() => {
     async function fetchTrackers() {
-      if (!id || isLoading || !user) {
+      if (!id || isLoading || !userId) {
         if (!isLoading) setLoading(false);
         return;
       }
@@ -71,7 +78,7 @@ export default function ObservationHistory() {
           .from("trackers")
           .select("id, title, plant_type, user_id, created_at")
           .eq("plant_type", id)
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -92,12 +99,12 @@ export default function ObservationHistory() {
       }
     }
     fetchTrackers();
-  }, [id, user, isLoading, trackerIdFromQuery]);
+  }, [id, userId, isLoading, trackerIdFromQuery]);
 
   // Fetch chart/logs data when tracker is selected
   useEffect(() => {
     async function fetchLogs() {
-      if (!selectedTrackerId || !user) return;
+      if (!selectedTrackerId || !userId) return;
 
       try {
         const { data: logsData, error } = await supabase
@@ -144,11 +151,11 @@ export default function ObservationHistory() {
       }
     }
     fetchLogs();
-  }, [selectedTrackerId, user]);
+  }, [selectedTrackerId, userId]);
 
   // Helper to reload logs (used after edit/delete)
   async function reloadLogs() {
-    if (!selectedTrackerId || !user) return;
+    if (!selectedTrackerId || !userId) return;
     try {
       const { data: logsData, error } = await supabase
         .from("growth_logs")
@@ -255,6 +262,91 @@ export default function ObservationHistory() {
     }
   }
 
+  // Reload Costs
+  async function reloadCosts() {
+    if (!selectedTrackerId || !userId) return;
+    try {
+      const { data, error } = await supabase
+        .from("production_costs")
+        .select("*")
+        .eq("tracker_id", selectedTrackerId)
+        .order("date", { ascending: false });
+      
+      if (error) {
+        // If table doesn't exist yet, just ignore or log
+        console.error("Error loading costs (maybe table not created?):", error);
+        return;
+      }
+      setCosts(data || []);
+    } catch (err) {
+      console.error("Failed to load costs", err);
+    }
+  }
+
+  // Effect to load costs when tracker selected
+  useEffect(() => {
+    reloadCosts();
+  }, [selectedTrackerId, userId]);
+
+  // Handle Save Cost
+  async function handleSaveCost(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (!selectedTrackerId) return;
+    
+    const formData = new FormData(e.currentTarget);
+    const costData = {
+      tracker_id: selectedTrackerId,
+      date: formData.get("date") as string,
+      category: formData.get("category") as string,
+      description: formData.get("description") as string,
+      amount: parseFloat(formData.get("amount") as string),
+    };
+
+    try {
+      if (editingCost) {
+        const { error } = await supabase.from("production_costs").update(costData).eq("id", editingCost.id);
+        if (error) throw error;
+        toast.success("Biaya berhasil diperbarui");
+      } else {
+        const { error } = await supabase.from("production_costs").insert(costData);
+        if (error) throw error;
+        toast.success("Biaya berhasil ditambahkan");
+      }
+      setShowCostForm(false);
+      setEditingCost(null);
+      reloadCosts();
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Gagal menyimpan biaya: " + err.message);
+    }
+  }
+
+  // Delete Cost
+  async function handleDeleteCost(id: string) {
+    if (!confirm("Hapus data biaya ini?")) return;
+    try {
+      const { error } = await supabase.from("production_costs").delete().eq("id", id);
+      if (error) throw error;
+      toast.success("Biaya dihapus");
+      reloadCosts();
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Gagal menghapus biaya");
+    }
+  }
+
+  // Cost categories
+  const costCategories = [
+    "Bibit", "Pupuk", "Obat-obatan/Pestisida", "Tenaga Kerja", "Sewa Alat", "Transportasi", "Lain-lain"
+  ];
+
+  // Calculate Total Costs
+  const totalCost = costs.reduce((sum, cost) => sum + Number(cost.amount), 0);
+  const costByCategory = costs.reduce((acc, cost) => {
+    acc[cost.category] = (acc[cost.category] || 0) + Number(cost.amount);
+    return acc;
+  }, {} as Record<string, number>);
+
   // Predictions component (simple heuristic)
   function PredictionsSection({ plantType, avgHeightGrowth, currentHeight, latestLog }: any) {
     const defaults: any = {
@@ -309,7 +401,7 @@ export default function ObservationHistory() {
       {/* Header */}
       <header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
         <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-2.5 hover:opacity-80 transition">
-          <img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
+          <img alt="Agrigrowth logo" loading="lazy" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
           <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
         </Link>
 
@@ -332,7 +424,7 @@ export default function ObservationHistory() {
               className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
             >
               <span>{user.name}</span>
-              <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+              <img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgProfile} />
             </Link>
             <button onClick={handleLogout} disabled={isLoggingOut} className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
               {isLoggingOut ? "Keluar..." : "Logout"}
@@ -422,7 +514,33 @@ export default function ObservationHistory() {
                   ← Kembali ke Daftar
                 </button>
               </div>
+
+              {/* Tabs */}
+              <div className="flex gap-4 border-b-2 border-gray-200">
+                <button
+                  onClick={() => setActiveTab("pengamatan")}
+                  className={`pb-2 text-[18px] font-bold transition-all ${
+                    activeTab === "pengamatan" 
+                      ? "border-b-4 border-[#365a1a] text-[#365a1a]" 
+                      : "text-gray-400 hover:text-[#365a1a]"
+                  }`}
+                >
+                  📈 Pengamatan & Analisis
+                </button>
+                <button
+                  onClick={() => setActiveTab("biaya")}
+                  className={`pb-2 text-[18px] font-bold transition-all ${
+                    activeTab === "biaya" 
+                      ? "border-b-4 border-[#365a1a] text-[#365a1a]" 
+                      : "text-gray-400 hover:text-[#365a1a]"
+                  }`}
+                >
+                  💰 Pengelolaan Biaya
+                </button>
+              </div>
               
+              {activeTab === "pengamatan" && (
+                <>
               {/* Grafik Tinggi Tanaman */}
               <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-6 shadow-sm">
                 <h2 className="mb-6 text-[20px] font-bold sm:text-[24px]">📊 GRAFIK TINGGI TANAMAN</h2>
@@ -531,6 +649,95 @@ export default function ObservationHistory() {
                   </div>
                 </div>
 
+                </>
+              )}
+
+              {activeTab === "biaya" && (
+                <div className="space-y-8">
+                  {/* Cost Summary Cards */}
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="rounded-[20px] border-2 border-[#365a1a] bg-gradient-to-br from-[#f0f4eb] to-white p-5 shadow-sm">
+                      <p className="text-sm font-semibold text-[#365a1a]/70 mb-1">Total Biaya Produksi</p>
+                      <h3 className="text-2xl font-extrabold text-[#365a1a]">Rp {totalCost.toLocaleString('id-ID')}</h3>
+                    </div>
+                    {costCategories.slice(0, 3).map(cat => (
+                       <div key={cat} className="rounded-[20px] border border-gray-200 bg-white p-5 shadow-sm">
+                         <p className="text-sm font-semibold text-gray-500 mb-1">{cat}</p>
+                         <h3 className="text-xl font-bold text-gray-800">Rp {(costByCategory[cat] || 0).toLocaleString('id-ID')}</h3>
+                       </div>
+                    ))}
+                  </div>
+
+                  {/* Add Cost Button & List */}
+                  <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-6 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-[20px] font-bold sm:text-[24px]">Daftar Biaya</h2>
+                      <button 
+                        onClick={() => { setEditingCost(null); setShowCostForm(true); }}
+                        className="rounded-full bg-[#365a1a] px-5 py-2 text-sm font-bold text-white shadow-md hover:bg-[#2d4915] transition"
+                      >
+                        + Tambah Biaya
+                      </button>
+                    </div>
+
+                    {costs.length === 0 ? (
+                      <div className="py-12 text-center text-gray-500">
+                        Belum ada catatan biaya. Klik "Tambah Biaya" untuk memulai.
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                          <thead>
+                            <tr className="border-b-2 border-gray-100">
+                              <th className="py-3 px-2 text-[#365a1a] font-semibold">Tanggal</th>
+                              <th className="py-3 px-2 text-[#365a1a] font-semibold">Kategori</th>
+                              <th className="py-3 px-2 text-[#365a1a] font-semibold">Keterangan</th>
+                              <th className="py-3 px-2 text-[#365a1a] font-semibold">Jumlah (Rp)</th>
+                              <th className="py-3 px-2 text-right text-[#365a1a] font-semibold">Aksi</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {costs.map(cost => (
+                              <tr key={cost.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                <td className="py-3 px-2 text-sm">{new Date(cost.date).toLocaleDateString('id-ID')}</td>
+                                <td className="py-3 px-2 text-sm">
+                                  <span className="bg-[#f0f4eb] text-[#365a1a] px-2 py-1 rounded-md font-medium text-xs">
+                                    {cost.category}
+                                  </span>
+                                </td>
+                                <td className="py-3 px-2 text-sm text-gray-600">{cost.description || "-"}</td>
+                                <td className="py-3 px-2 text-sm font-semibold">{Number(cost.amount).toLocaleString('id-ID')}</td>
+                                <td className="py-3 px-2 text-right">
+                                  <div className="flex justify-end gap-2">
+                                    <button onClick={() => { setEditingCost(cost); setShowCostForm(true); }} className="text-[#365a1a] hover:underline text-xs">Edit</button>
+                                    <button onClick={() => handleDeleteCost(cost.id)} className="text-red-500 hover:underline text-xs">Hapus</button>
+                                  </div>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Recap Chart / Detailed List */}
+                  {costs.length > 0 && (
+                    <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-6 shadow-sm">
+                      <h2 className="mb-4 text-[20px] font-bold sm:text-[24px]">📊 Rekap Biaya per Kategori</h2>
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        {Object.entries(costByCategory).sort((a,b) => (b[1] as number) - (a[1] as number)).map(([cat, amt]) => (
+                          <div key={cat} className="flex justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                            <span className="font-medium text-gray-700">{cat}</span>
+                            <span className="font-bold text-[#365a1a]">Rp {(amt as number).toLocaleString('id-ID')}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center rounded-[30px] border-2 border-dashed border-[#9fb08d] bg-white py-24 px-6 text-center">
@@ -590,6 +797,77 @@ export default function ObservationHistory() {
                 <button onClick={() => setEditingLog(null)} className="rounded border px-4 py-2">Batal</button>
                 <button onClick={() => handleUpdateLog(editingLog)} className="rounded bg-[#365a1a] px-4 py-2 text-white">Simpan</button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Cost Form Modal */}
+        {showCostForm && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 px-4">
+            <div className="w-full max-w-md rounded-[20px] bg-white p-6 shadow-xl">
+              <h3 className="text-xl font-bold text-[#365a1a] mb-5">
+                {editingCost ? "Edit Biaya" : "Tambah Biaya"}
+              </h3>
+              <form onSubmit={handleSaveCost} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold mb-1 text-gray-700">Tanggal</label>
+                  <input 
+                    type="date" 
+                    name="date" 
+                    required 
+                    defaultValue={editingCost ? editingCost.date : new Date().toISOString().split('T')[0]} 
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-[#365a1a] focus:ring-1 focus:ring-[#365a1a] outline-none" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1 text-gray-700">Kategori</label>
+                  <select 
+                    name="category" 
+                    required 
+                    defaultValue={editingCost ? editingCost.category : costCategories[0]} 
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-[#365a1a] focus:ring-1 focus:ring-[#365a1a] outline-none bg-white"
+                  >
+                    {costCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1 text-gray-700">Keterangan</label>
+                  <input 
+                    type="text" 
+                    name="description" 
+                    placeholder="Contoh: Beli bibit unggul 5kg"
+                    defaultValue={editingCost?.description || ""} 
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-[#365a1a] focus:ring-1 focus:ring-[#365a1a] outline-none" 
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-1 text-gray-700">Jumlah Biaya (Rp)</label>
+                  <input 
+                    type="number" 
+                    name="amount" 
+                    required 
+                    min="0"
+                    placeholder="Contoh: 150000"
+                    defaultValue={editingCost?.amount || ""} 
+                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-[#365a1a] focus:ring-1 focus:ring-[#365a1a] outline-none" 
+                  />
+                </div>
+                <div className="pt-4 flex justify-end gap-3">
+                  <button 
+                    type="button" 
+                    onClick={() => { setShowCostForm(false); setEditingCost(null); }} 
+                    className="rounded-full border border-gray-300 px-5 py-2 font-medium hover:bg-gray-50 transition"
+                  >
+                    Batal
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="rounded-full bg-[#365a1a] px-5 py-2 font-medium text-white hover:bg-[#2d4915] transition shadow-md"
+                  >
+                    Simpan
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

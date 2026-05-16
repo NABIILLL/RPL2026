@@ -53,12 +53,13 @@ export default function ObservationForm() {
   const [trackers, setTrackers] = useState<TrackerData[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const userId = user?.id;
 
   // Fetch user's trackers
   useEffect(() => {
     if (userLoading) return;
 
-    if (!user) {
+    if (!userId) {
       console.log("No user found, redirecting...");
       setLoading(false);
       return;
@@ -66,11 +67,11 @@ export default function ObservationForm() {
 
     const fetchTrackers = async () => {
       try {
-        console.log("Fetching trackers for user:", user.id);
+        console.log("Fetching trackers for user:", userId);
         const { data, error } = await supabase
           .from("trackers")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("created_at", { ascending: false });
 
         if (error) {
@@ -97,7 +98,7 @@ export default function ObservationForm() {
     };
 
     fetchTrackers();
-  }, [user, userLoading]);
+  }, [userId, userLoading]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -224,7 +225,7 @@ export default function ObservationForm() {
       <main className="min-h-screen bg-[#f4f4f4]">
         <header className="mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
           <Link href="/dashboard" className="flex items-center gap-2.5 hover:opacity-80 transition">
-            <img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
+            <img alt="Agrigrowth logo" loading="lazy" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
             <b className="text-[20px] leading-none sm:text-[21px] text-[#365a1a]">Agrigrowth Monitor</b>
           </Link>
         </header>
@@ -245,7 +246,7 @@ export default function ObservationForm() {
       {/* Header */}
       <header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
         <Link href="/dashboard" className="flex items-center gap-2.5 hover:opacity-80 transition">
-          <img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
+          <img alt="Agrigrowth logo" loading="lazy" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
           <b className="text-[20px] leading-none sm:text-[21px] text-[#365a1a]">Agrigrowth Monitor</b>
         </Link>
 
@@ -266,7 +267,7 @@ export default function ObservationForm() {
             className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
           >
             <span>{user.name}</span>
-            <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+            <img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgProfile} />
           </Link>
           <button onClick={handleLogout} disabled={isLoggingOut} className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
             {isLoggingOut ? "Keluar..." : "Logout"}

@@ -20,6 +20,7 @@ const navSections = [
       { label: "Profiles", href: "/admin/profiles", icon: "ti ti-id" },
       { label: "Trackers", href: "/admin/trackers", icon: "ti ti-plant-2" },
       { label: "Observations", href: "/admin/observations", icon: "ti ti-notes" },
+      { label: "Production Costs", href: "/admin/costs", icon: "ti ti-wallet" },
     ],
   },
   {

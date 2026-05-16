@@ -28,9 +28,10 @@ export default function Overviews() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const displayName = !isLoading && user ? user.name : "Guest";
   const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
+  const userId = user?.id;
 
   useEffect(() => {
-    if (isLoading || !user) {
+    if (isLoading || !userId) {
       if (!isLoading) setLoading(false);
       return;
     }
@@ -40,7 +41,7 @@ export default function Overviews() {
         const { data, error } = await supabase
           .from("trackers")
           .select("*")
-          .eq("user_id", user.id)
+          .eq("user_id", userId)
           .order("created_at", { ascending: false });
 
         if (error) throw error;
@@ -53,7 +54,7 @@ export default function Overviews() {
     };
 
     fetchTrackers();
-  }, [user, isLoading]);
+  }, [userId, isLoading]);
 
   const getPlantLabel = (plantType: string) => {
     switch (plantType) {
@@ -100,7 +101,7 @@ export default function Overviews() {
       {/* Header */}
       <header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
         <Link href="/dashboard" className="flex items-center gap-2.5 hover:opacity-80 transition">
-          <img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
+          <img alt="Agrigrowth logo" loading="lazy" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
           <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
         </Link>
 
@@ -124,7 +125,7 @@ export default function Overviews() {
                 className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
               >
                 <span>{displayName}</span>
-                <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+                <img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgProfile} />
               </Link>
               <button
                 onClick={handleLogout}
@@ -150,7 +151,7 @@ export default function Overviews() {
         <article className="rounded-[30px] bg-white p-5 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)] sm:p-6">
           <div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
             <div className="h-[190px] w-full overflow-hidden rounded-[20px] md:h-[273px] md:max-w-[605px]">
-              <img alt="Overviews" className="h-full w-full object-cover" src={imgOverviewImage} />
+              <img alt="Overviews" loading="lazy" className="h-full w-full object-cover" src={imgOverviewImage} />
             </div>
 
             <div className="w-full md:max-w-[578px]">
@@ -194,6 +195,7 @@ export default function Overviews() {
                   <div className="h-[150px] w-full overflow-hidden rounded-[20px] md:h-[180px] md:w-[240px] md:flex-shrink-0">
                     <img
                       alt={tracker.title}
+                      loading="lazy"
                       className="h-full w-full object-cover"
                       src={getPlantImage(tracker.plant_type)}
                     />

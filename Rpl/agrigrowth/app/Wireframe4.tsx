@@ -43,7 +43,7 @@ export default function Wireframe4() {
 			<AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 			<header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
 				<div className="flex items-center gap-2.5">
-					<img alt="Agrigrowth logo" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
+					<img alt="Agrigrowth logo" loading="lazy" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
 					<b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
 				</div>
 
@@ -61,7 +61,7 @@ export default function Wireframe4() {
 								className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
 							>
 								<span>{user.name}</span>
-								<img alt="Profile" className="h-8 w-8 object-contain" src={imgProfile} />
+								<img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgProfile} />
 							</Link>
 							<button 
 								onClick={handleLogout}
@@ -103,7 +103,7 @@ export default function Wireframe4() {
 							}}>
 								<div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
 									<div className="h-[190px] w-full overflow-hidden rounded-[20px] md:h-[273px] md:max-w-[605px] group-hover:opacity-80 transition">
-										<img alt={feature.title} className="h-full w-full object-cover" src={feature.image} />
+										<img alt={feature.title} loading="lazy" className="h-full w-full object-cover" src={feature.image} />
 									</div>
 
 									<div className="w-full md:max-w-[578px]">
