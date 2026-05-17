@@ -1,17 +1,13 @@
 "use client";
 
-const heroBackground =
-  "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=2000&auto=format&fit=crop";
-const logoMark =
-  "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import HeaderWithModal from "@/components/HeaderWithModal";
 import AuthModal from "@/components/AuthModal";
 import { useUser } from "@/hooks/useUser";
 
-const navItems = ["Home", "About", "Features"];
+const heroBackground =
+  "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=2000&auto=format&fit=crop";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);

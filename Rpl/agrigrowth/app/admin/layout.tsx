@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/hooks/useUser";
 import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
+import AgrigrowthLogo from "@/components/AgrigrowthLogo";
 import "./admin.css";
 
 const navSections = [
@@ -84,10 +85,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <div className="app">
         <aside className="sidebar">
           <div className="sidebar-logo">
-            <div className="logo-mark">
-              <div className="logo-icon"><i className="ti ti-leaf"></i></div>
-              <div className="logo-text">AgriGrowth<span>Monitor · Admin</span></div>
-            </div>
+            <AgrigrowthLogo tone="light" textClassName="logo-text" />
             <div className="env-badge"><div className="env-dot"></div> Production</div>
           </div>
 

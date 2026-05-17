@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 
-const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
-const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
-
 import { useUser } from "@/hooks/useUser";
 import AuthModal from "@/components/AuthModal";
 import { useState } from "react";
 import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
+import AgrigrowthLogo from "../../components/AgrigrowthLogo";
+
+const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
 
 export default function About() {
   const { user, isLoading } = useUser();
@@ -20,10 +20,10 @@ export default function About() {
       <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       {/* Header */}
       <header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
-        <div className="flex items-center gap-2.5">
-          <img alt="Agrigrowth logo" loading="lazy" className="h-[51px] w-[59px] object-contain" src={imgLogo} />
-          <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
-        </div>
+        <AgrigrowthLogo
+          tone="light"
+          textClassName="text-[20px] font-bold leading-none text-[#365a1a] sm:text-[21px]"
+        />
 
         <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
           <Link href={user ? "/dashboard" : "/"} className="transition hover:opacity-80">
