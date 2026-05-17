@@ -54,16 +54,6 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       return;
     }
 
-    if (initialMode === "login") {
-      setStep("login-email");
-      return;
-    }
-
-    if (initialMode === "signup") {
-      setStep("signup-email");
-      return;
-    }
-
     setStep("choice");
   }, [isOpen, initialMode, initialStep]);
 
@@ -77,7 +67,7 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
           queryParams: {
             prompt: "select_account",
           },
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/callback?mode=${authMode}`,
         },
       });
       if (error) throw error;
@@ -252,7 +242,7 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       </button>
 
       {/* Modal card */}
-      <div className="relative w-full max-w-[525px] max-h-[90vh] overflow-y-auto rounded-[25px] bg-white px-[42px] py-[40px] md:py-[60px] pb-[38px]">
+      <div className="relative w-full max-w-[525px] max-h-[90vh] overflow-y-auto rounded-[25px] bg-white px-[42px] py-[40px] md:py-[60px] pb-[38px] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {/* Logo */}
         <div className="mb-[50px] flex justify-center">
           <img alt="Logo" className="h-[51px] w-[59px]" src={imgGroup2} />

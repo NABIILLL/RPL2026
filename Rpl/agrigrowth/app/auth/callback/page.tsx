@@ -27,6 +27,14 @@ export default function AuthCallback() {
         const user = session?.user;
 
         if (user?.id) {
+          const mode = urlParams.get("mode");
+          const createdAt = new Date(user.created_at).getTime();
+          const isNewUser = Date.now() - createdAt < 30000; // Account created within last 30 seconds
+
+          if (mode === "signup" && !isNewUser) {
+            await supabase.auth.signOut();
+            throw new Error("Akun Google sudah terdaftar. Silakan gunakan menu Masuk (Login).");
+          }
           let role = user.user_metadata?.role || null;
 
           if (session?.access_token) {
