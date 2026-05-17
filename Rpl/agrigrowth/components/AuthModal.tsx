@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveUser } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
+import { toast } from "react-hot-toast";
 
 const imgGroup2 =
   "https://www.figma.com/api/mcp/asset/eb8b6bb8-e06c-41c9-9ec8-8aca0e559999";
@@ -81,7 +82,7 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       });
       if (error) throw error;
     } catch (error: any) {
-      alert(error.message);
+      toast.error(error.message);
     }
   };
 
@@ -120,9 +121,16 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       });
       if (error) throw error;
 
+      // Supabase returns an empty identities array if the email is already registered
+      // to prevent email enumeration when email confirmation is enabled.
+      if (data.user?.identities && data.user.identities.length === 0) {
+        toast.error("Email sudah terdaftar");
+        return;
+      }
+
       // Jika konfirmasi email diaktifkan di Supabase, session akan bernilai null
       if (data.user && data.session === null) {
-        alert("Pendaftaran berhasil! Silakan cek kotak masuk email Anda untuk mengkonfirmasi akun sebelum masuk.");
+        toast.success("Pendaftaran berhasil! Silakan cek kotak masuk email Anda untuk mengkonfirmasi akun sebelum masuk.", { duration: 5000 });
         setStep("choice");
         return;
       }
@@ -130,7 +138,7 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       saveUser({ id: data.user?.id, name, email, role });
       handleAuthSuccess();
     } catch (error: any) {
-      alert(error.message);
+      toast.error(error.message);
     }
   };
 
@@ -182,7 +190,7 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       });
       handleAuthSuccess(roleFromDb);
     } catch (error: any) {
-      alert(error.message);
+      toast.error(error.message);
     }
   };
 
@@ -244,7 +252,7 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       </button>
 
       {/* Modal card */}
-      <div className="relative w-full max-w-[525px] rounded-[25px] bg-white px-[42px] py-[60px] pb-[38px]">
+      <div className="relative w-full max-w-[525px] max-h-[90vh] overflow-y-auto rounded-[25px] bg-white px-[42px] py-[40px] md:py-[60px] pb-[38px]">
         {/* Logo */}
         <div className="mb-[50px] flex justify-center">
           <img alt="Logo" className="h-[51px] w-[59px]" src={imgGroup2} />
@@ -252,8 +260,8 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
 
         {/* Step: Choice */}
         {step === "choice" && (
-          <div className="space-y-6">
-            <div className="mb-8 text-center">
+          <div className="space-y-3">
+            <div className="mb-5 text-center">
               <h2 className="font-['Plus_Jakarta_Sans:Bold'] text-[24px] font-bold text-black">
                 Selamat Datang
               </h2>
@@ -286,8 +294,8 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
 
         {/* Step: Sign Up Method Selection */}
         {step === "signup-method" && (
-          <div className="space-y-4">
-            <div className="mb-8 text-center">
+          <div className="space-y-3">
+            <div className="mb-5 text-center">
               <h2 className="font-['Plus_Jakarta_Sans:Bold'] text-[24px] font-bold text-black">
                 Daftar Akun Baru
               </h2>
@@ -334,8 +342,8 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
 
         {/* Step: Login Method Selection */}
         {step === "login-method" && (
-          <div className="space-y-4">
-            <div className="mb-8 text-center">
+          <div className="space-y-3">
+            <div className="mb-5 text-center">
               <h2 className="font-['Plus_Jakarta_Sans:Bold'] text-[24px] font-bold text-black">
                 Masuk Akun
               </h2>
@@ -382,8 +390,8 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
 
         {/* Step: Sign Up with Email */}
         {step === "signup-email" && (
-          <form onSubmit={handleSignUpEmailNext} className="space-y-4">
-            <div className="mb-8 text-center">
+          <form onSubmit={handleSignUpEmailNext} className="space-y-3">
+            <div className="mb-5 text-center">
               <h2 className="font-['Plus_Jakarta_Sans:Bold'] text-[20px] font-bold text-black">
                 Daftar dengan Email
               </h2>
@@ -494,8 +502,8 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
 
         {/* Step: Sign Up with Phone */}
         {step === "signup-phone" && (
-          <form onSubmit={handleSignUpPhoneNext} className="space-y-4">
-            <div className="mb-8 text-center">
+          <form onSubmit={handleSignUpPhoneNext} className="space-y-3">
+            <div className="mb-5 text-center">
               <h2 className="font-['Plus_Jakarta_Sans:Bold'] text-[20px] font-bold text-black">
                 Daftar dengan Nomor Telp
               </h2>
@@ -532,8 +540,8 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
 
         {/* Step: Sign Up Phone Verification */}
         {step === "signup-phone-verify" && (
-          <form onSubmit={handleSignUpPhoneVerify} className="space-y-4">
-            <div className="mb-8 text-center">
+          <form onSubmit={handleSignUpPhoneVerify} className="space-y-3">
+            <div className="mb-5 text-center">
               <h2 className="font-['Plus_Jakarta_Sans:Bold'] text-[20px] font-bold text-black">
                 Verifikasi Nomor Telp
               </h2>
@@ -571,8 +579,8 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
 
         {/* Step: Sign Up Phone - Data Input */}
         {step === "signup-phone-data" && (
-          <form onSubmit={handleSignUpPhoneData} className="space-y-4">
-            <div className="mb-8 text-center">
+          <form onSubmit={handleSignUpPhoneData} className="space-y-3">
+            <div className="mb-5 text-center">
               <h2 className="font-['Plus_Jakarta_Sans:Bold'] text-[20px] font-bold text-black">
                 Lengkapi Data Anda
               </h2>
@@ -653,8 +661,8 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
 
         {/* Step: Login with Email */}
         {step === "login-email" && (
-          <form onSubmit={handleLoginEmailNext} className="space-y-4">
-            <div className="mb-8 text-center">
+          <form onSubmit={handleLoginEmailNext} className="space-y-3">
+            <div className="mb-5 text-center">
               <h2 className="font-['Plus_Jakarta_Sans:Bold'] text-[20px] font-bold text-black">
                 Masuk dengan Email
               </h2>
@@ -720,8 +728,8 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
 
         {/* Step: Login with Phone */}
         {step === "login-phone" && (
-          <form onSubmit={handleLoginPhoneNext} className="space-y-4">
-            <div className="mb-8 text-center">
+          <form onSubmit={handleLoginPhoneNext} className="space-y-3">
+            <div className="mb-5 text-center">
               <h2 className="font-['Plus_Jakarta_Sans:Bold'] text-[20px] font-bold text-black">
                 Masuk dengan Nomor Telp
               </h2>
@@ -758,8 +766,8 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
 
         {/* Step: Login Phone Verification */}
         {step === "login-phone-verify" && (
-          <form onSubmit={handleLoginPhoneVerify} className="space-y-4">
-            <div className="mb-8 text-center">
+          <form onSubmit={handleLoginPhoneVerify} className="space-y-3">
+            <div className="mb-5 text-center">
               <h2 className="font-['Plus_Jakarta_Sans:Bold'] text-[20px] font-bold text-black">
                 Verifikasi Nomor Telp
               </h2>
