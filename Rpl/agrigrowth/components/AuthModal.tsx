@@ -72,7 +72,7 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       });
       if (error) throw error;
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message, { id: error.message });
     }
   };
 
@@ -114,13 +114,13 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       // Supabase returns an empty identities array if the email is already registered
       // to prevent email enumeration when email confirmation is enabled.
       if (data.user?.identities && data.user.identities.length === 0) {
-        toast.error("Email sudah terdaftar");
+        toast.error("Email sudah terdaftar", { id: "Email sudah terdaftar" });
         return;
       }
 
       // Jika konfirmasi email diaktifkan di Supabase, session akan bernilai null
       if (data.user && data.session === null) {
-        toast.success("Pendaftaran berhasil! Silakan cek kotak masuk email Anda untuk mengkonfirmasi akun sebelum masuk.", { duration: 5000 });
+        toast.success("Pendaftaran berhasil! Silakan cek kotak masuk email Anda untuk mengkonfirmasi akun sebelum masuk.", { duration: 5000, id: "signup-success" });
         setStep("choice");
         return;
       }
@@ -128,7 +128,7 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       saveUser({ id: data.user?.id, name, email, role });
       handleAuthSuccess();
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message, { id: error.message });
     }
   };
 
@@ -180,7 +180,7 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       });
       handleAuthSuccess(roleFromDb);
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error.message, { id: error.message });
     }
   };
 

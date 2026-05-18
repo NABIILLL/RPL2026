@@ -87,10 +87,10 @@ export default function Overviews() {
 
       // Update UI by removing the deleted tracker
       setTrackers(trackers.filter(t => t.id !== trackerId));
-      toast.success("Tracker berhasil dihapus");
+      toast.success("Tracker berhasil dihapus", { id: "Tracker berhasil dihapus" });
     } catch (error) {
       console.error("Error deleting tracker:", error);
-      toast.error("Gagal menghapus tracker");
+      toast.error("Gagal menghapus tracker", { id: "Gagal menghapus tracker" });
     } finally {
       setDeleting(null);
     }

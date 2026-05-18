@@ -51,6 +51,7 @@ export default function Dashboard() {
   const [activeTrackerTitle, setActiveTrackerTitle] = useState("");
   const [activeTrackerId, setActiveTrackerId] = useState<string | null>(null);
   const [activePlantLabel, setActivePlantLabel] = useState("Padi");
+  const [isCreatingTracker, setIsCreatingTracker] = useState(false);
   const { user, isLoading } = useUser();
   const router = useRouter();
   const displayName = !isLoading && user ? user.name : "Guest";
@@ -83,10 +84,11 @@ export default function Dashboard() {
     if (!selectedPlant) return;
 
     if (!user || !user.id) {
-      toast.error("Anda harus login untuk membuat tracker.");
+      toast.error("Anda harus login untuk membuat tracker.", { id: "Anda harus login untuk membuat tracker." });
       return;
     }
 
+    setIsCreatingTracker(true);
     try {
       const { data, error } = await supabase
         .from("trackers")
@@ -110,14 +112,16 @@ export default function Dashboard() {
       setIsPlantMenuOpen(false);
     } catch (err: any) {
       console.error(err);
-      toast.error("Gagal membuat tracker: " + err.message);
+      toast.error("Gagal membuat tracker: " + err.message, { id: "Gagal membuat tracker: " + err.message });
+    } finally {
+      setIsCreatingTracker(false);
     }
   };
 
   const handleSaveAnalysis = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!activeTrackerId) {
-      toast.error("Tracker ID tidak ditemukan.");
+      toast.error("Tracker ID tidak ditemukan.", { id: "Tracker ID tidak ditemukan." });
       return;
     }
 
@@ -130,27 +134,27 @@ export default function Dashboard() {
     const landArea = parseFloat(formData.get("land_area") as string) || null;
 
     if (dayNumber < 1) {
-      toast.error("Hari pengamatan tidak valid.");
+      toast.error("Hari pengamatan tidak valid.", { id: "Hari pengamatan tidak valid." });
       return;
     }
     if (plantHeight !== null && plantHeight < 0) {
-      toast.error("Tinggi tanaman tidak boleh negatif.");
+      toast.error("Tinggi tanaman tidak boleh negatif.", { id: "Tinggi tanaman tidak boleh negatif." });
       return;
     }
     if (leafCount !== null && leafCount < 0) {
-      toast.error("Jumlah daun tidak boleh negatif.");
+      toast.error("Jumlah daun tidak boleh negatif.", { id: "Jumlah daun tidak boleh negatif." });
       return;
     }
     if (branchCount !== null && branchCount < 0) {
-      toast.error("Jumlah cabang tidak boleh negatif.");
+      toast.error("Jumlah cabang tidak boleh negatif.", { id: "Jumlah cabang tidak boleh negatif." });
       return;
     }
     if (soilPh !== null && (soilPh < 0 || soilPh > 14)) {
-      toast.error("Input pH tanah tidak sesuai (harus antara 0 - 14).");
+      toast.error("Input pH tanah tidak sesuai (harus antara 0 - 14).", { id: "Input pH tanah tidak sesuai (harus antara 0 - 14)." });
       return;
     }
     if (landArea !== null && landArea < 0) {
-      toast.error("Luas lahan tidak boleh negatif.");
+      toast.error("Luas lahan tidak boleh negatif.", { id: "Luas lahan tidak boleh negatif." });
       return;
     }
 
@@ -161,12 +165,12 @@ export default function Dashboard() {
     const isOnlyNumeric = (str: string | null) => str !== null && /^[0-9.]+$/.test(str);
 
     if (isOnlyNumeric(lightCondition)) {
-      toast.error("Kondisi cahaya tidak boleh hanya berisi angka.");
+      toast.error("Kondisi cahaya tidak boleh hanya berisi angka.", { id: "Kondisi cahaya tidak boleh hanya berisi angka." });
       return;
     }
 
     if (isOnlyNumeric(plantCondition)) {
-      toast.error("Kondisi tanaman tidak boleh hanya berisi angka.");
+      toast.error("Kondisi tanaman tidak boleh hanya berisi angka.", { id: "Kondisi tanaman tidak boleh hanya berisi angka." });
       return;
     }
 
@@ -187,17 +191,17 @@ export default function Dashboard() {
       const { error } = await supabase.from("growth_logs").insert(logData);
       if (error) throw error;
 
-      toast.success("Data pengamatan berhasil disimpan!");
+      toast.success("Data pengamatan berhasil disimpan!", { id: "Data pengamatan berhasil disimpan!" });
       setLatestLog(logData);
     } catch (err: any) {
       console.error(err);
       // Ganti pesan error Supabase dengan pesan yang lebih ramah pengguna
       if (err.message?.includes("check_light_not_numeric")) {
-        toast.error("Kondisi cahaya tidak boleh hanya berisi angka.");
+        toast.error("Kondisi cahaya tidak boleh hanya berisi angka.", { id: "Kondisi cahaya tidak boleh hanya berisi angka." });
       } else if (err.message?.includes("check_condition_not_numeric")) {
-        toast.error("Kondisi tanaman tidak boleh hanya berisi angka.");
+        toast.error("Kondisi tanaman tidak boleh hanya berisi angka.", { id: "Kondisi tanaman tidak boleh hanya berisi angka." });
       } else {
-        toast.error("Gagal menyimpan data pengamatan: " + err.message);
+        toast.error("Gagal menyimpan data pengamatan: " + err.message, { id: "Gagal menyimpan data pengamatan: " + err.message });
       }
     }
   };
@@ -589,10 +593,10 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={handleContinue}
-              disabled={!selectedPlant}
+              disabled={!selectedPlant || isCreatingTracker}
               className="mt-5 h-[30px] w-full rounded-full bg-[#365a1a] text-[14px] font-semibold text-white transition hover:bg-[#2d4915] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Lanjut →
+              {isCreatingTracker ? "Memproses..." : "Lanjut →"}
             </button>
           </div>
         </div>

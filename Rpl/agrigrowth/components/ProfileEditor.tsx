@@ -90,7 +90,7 @@ const firstError = (errors: FieldErrors) => Object.values(errors).find(Boolean) 
 
 const saveProfile = async (token: string, payload: Partial<UserProfile>) => {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 7000);
+  const timeoutId = setTimeout(() => controller.abort(), 14000);
 
   try {
     const response = await fetch('/api/profile', {
@@ -183,7 +183,7 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
     let watchdog: ReturnType<typeof setTimeout> | null = null;
 
     if (!user?.id) {
-      toast.error('User ID tidak ditemukan');
+      toast.error('User ID tidak ditemukan', { id: 'User ID tidak ditemukan' });
       return;
     }
 
@@ -192,7 +192,7 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
     setFieldErrors(errors);
     if (message) {
       setFormError(message);
-      toast.error(message);
+      toast.error(message, { id: message });
       return;
     }
 
@@ -202,13 +202,13 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
       const message = 'Menyimpan terlalu lama. Cek koneksi/Supabase lalu coba lagi.';
       setIsSubmitting(false);
       setFormError(message);
-      toast.error(message);
-    }, 9000);
+      toast.error(message, { id: message });
+    }, 15000);
 
     try {
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || sessionData.session?.user.id !== user.id || !sessionData.session.access_token) {
-        toast.error('Sesi login tidak ditemukan. Silakan login ulang.');
+        toast.error('Sesi login tidak ditemukan. Silakan login ulang.', { id: 'Sesi login tidak ditemukan. Silakan login ulang.' });
         return;
       }
 
@@ -236,12 +236,12 @@ export default function ProfileEditor({ isOpen, user, onClose }: ProfileEditorPr
       window.dispatchEvent(new CustomEvent('profile-updated', { detail: updatedUser }));
       setSafeFormData({ phone: phone.value });
 
-      toast.success('Profil berhasil disimpan');
+      toast.success('Profil berhasil disimpan', { id: 'Profil berhasil disimpan' });
       onClose();
     } catch (err) {
       const message = err instanceof Error ? err.message : 'unknown';
       setFormError(message);
-      toast.error(`Gagal menyimpan profil: ${message}`);
+      toast.error(`Gagal menyimpan profil: ${message}`, { id: `Gagal menyimpan profil: ${message}` });
     } finally {
       if (watchdog) {
         clearTimeout(watchdog);

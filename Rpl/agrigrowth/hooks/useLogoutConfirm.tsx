@@ -62,6 +62,7 @@ export function useLogoutConfirm() {
         </div>
       ),
       {
+        id: "logout-toast",
         duration: Infinity,
       }
     );

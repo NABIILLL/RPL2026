@@ -201,7 +201,7 @@ export default function ObservationHistory() {
       }
     } catch (err) {
       console.error("Error reloading logs:", err);
-      toast.error("Gagal memuat ulang data");
+      toast.error("Gagal memuat ulang data", { id: "Gagal memuat ulang data" });
     }
   }
 
@@ -223,17 +223,17 @@ export default function ObservationHistory() {
         // revert optimistic removal on failure
         await reloadLogs();
         console.error("Error deleting log:", error);
-        toast.error(`Gagal menghapus data: ${error.message || "unknown"}`);
+        toast.error(`Gagal menghapus data: ${error.message || "unknown"}`, { id: `Gagal menghapus data: ${error.message || "unknown"}` });
         return;
       }
 
       // Success
-      toast.success("Data pengamatan berhasil dihapus");
+      toast.success("Data pengamatan berhasil dihapus", { id: "Data pengamatan berhasil dihapus" });
       // ensure UI consistent
       await reloadLogs();
     } catch (err: any) {
       console.error("Error deleting log (unexpected):", err);
-      toast.error(`Gagal menghapus data: ${err?.message ?? "unknown"}`);
+      toast.error(`Gagal menghapus data: ${err?.message ?? "unknown"}`, { id: `Gagal menghapus data: ${err?.message ?? "unknown"}` });
       await reloadLogs();
     }
   }
@@ -256,12 +256,12 @@ export default function ObservationHistory() {
       const { error } = await supabase.from("growth_logs").update(payload).eq("id", updated.id);
       if (error) throw error;
 
-      toast.success("Data pengamatan berhasil diperbarui");
+      toast.success("Data pengamatan berhasil diperbarui", { id: "Data pengamatan berhasil diperbarui" });
       setEditingLog(null);
       await reloadLogs();
     } catch (err: any) {
       console.error("Error updating log:", err);
-      toast.error(`Gagal memperbarui data: ${err?.message ?? "unknown"}`);
+      toast.error(`Gagal memperbarui data: ${err?.message ?? "unknown"}`, { id: `Gagal memperbarui data: ${err?.message ?? "unknown"}` });
     }
   }
 
@@ -309,18 +309,18 @@ export default function ObservationHistory() {
       if (editingCost) {
         const { error } = await supabase.from("production_costs").update(costData).eq("id", editingCost.id);
         if (error) throw error;
-        toast.success("Biaya berhasil diperbarui");
+        toast.success("Biaya berhasil diperbarui", { id: "Biaya berhasil diperbarui" });
       } else {
         const { error } = await supabase.from("production_costs").insert(costData);
         if (error) throw error;
-        toast.success("Biaya berhasil ditambahkan");
+        toast.success("Biaya berhasil ditambahkan", { id: "Biaya berhasil ditambahkan" });
       }
       setShowCostForm(false);
       setEditingCost(null);
       reloadCosts();
     } catch (err: any) {
       console.error(err);
-      toast.error("Gagal menyimpan biaya: " + err.message);
+      toast.error("Gagal menyimpan biaya: " + err.message, { id: "Gagal menyimpan biaya: " + err.message });
     }
   }
 
@@ -330,11 +330,11 @@ export default function ObservationHistory() {
     try {
       const { error } = await supabase.from("production_costs").delete().eq("id", id);
       if (error) throw error;
-      toast.success("Biaya dihapus");
+      toast.success("Biaya dihapus", { id: "Biaya dihapus" });
       reloadCosts();
     } catch (err: any) {
       console.error(err);
-      toast.error("Gagal menghapus biaya");
+      toast.error("Gagal menghapus biaya", { id: "Gagal menghapus biaya" });
     }
   }
 
@@ -401,12 +401,12 @@ export default function ObservationHistory() {
 
   async function handleExportPDF() {
     if (!userId) {
-      toast.error("Anda harus login untuk export PDF");
+      toast.error("Anda harus login untuk export PDF", { id: "Anda harus login untuk export PDF" });
       return;
     }
     const element = document.getElementById("pdf-content");
     if (!element) {
-      toast.error("Tidak ada konten untuk di-export");
+      toast.error("Tidak ada konten untuk di-export", { id: "Tidak ada konten untuk di-export" });
       return;
     }
 
@@ -436,7 +436,14 @@ export default function ObservationHistory() {
       
       const pdfBlob = pdf.output("blob");
 
-      const fileName = `${userId}/Laporan_${trackerTitle}_${Date.now()}.pdf`;
+      const d = new Date();
+      const dd = String(d.getDate()).padStart(2, '0');
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const yy = String(d.getFullYear()).slice(-2);
+      const dateStr = `${dd}${mm}${yy}`;
+      const baseFileName = `Laporan_${trackerTitle}_${dateStr}.pdf`;
+      const fileName = `${userId}/${baseFileName}`;
+      
       const { data, error } = await supabase
         .storage
         .from("agrigrowthpdf")
@@ -449,7 +456,10 @@ export default function ObservationHistory() {
         throw error;
       }
 
-      toast.success("PDF berhasil disimpan ke Storage!", { id: toastId });
+      // Automatically download the file to the user's device
+      pdf.save(baseFileName);
+
+      toast.success("PDF berhasil diunduh dan disimpan!", { id: toastId });
     } catch (err: any) {
       console.error("Export PDF Error:", err);
       toast.error(`Gagal menyimpan PDF: ${err.message}`, { id: toastId });

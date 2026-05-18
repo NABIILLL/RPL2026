@@ -91,7 +91,7 @@ export default function ObservationForm() {
         }
       } catch (error) {
         console.error("Error fetching trackers:", error);
-        toast.error("Gagal memuat daftar tracker");
+        toast.error("Gagal memuat daftar tracker", { id: "Gagal memuat daftar tracker" });
       } finally {
         setLoading(false);
       }
@@ -113,39 +113,39 @@ export default function ObservationForm() {
 
     // Validation
     if (!formData.trackerSelect) {
-      toast.error("Pilih tracker terlebih dahulu");
+      toast.error("Pilih tracker terlebih dahulu", { id: "Pilih tracker terlebih dahulu" });
       return;
     }
     if (!formData.dayNumber || parseInt(formData.dayNumber) < 1) {
-      toast.error("Masukkan hari pengamatan yang valid");
+      toast.error("Masukkan hari pengamatan yang valid", { id: "Masukkan hari pengamatan yang valid" });
       return;
     }
     if (!formData.plantHeight || parseFloat(formData.plantHeight) <= 0) {
-      toast.error("Masukkan tinggi tanaman yang valid");
+      toast.error("Masukkan tinggi tanaman yang valid", { id: "Masukkan tinggi tanaman yang valid" });
       return;
     }
     if (!formData.leafCount || parseInt(formData.leafCount) < 0) {
-      toast.error("Masukkan jumlah daun yang valid");
+      toast.error("Masukkan jumlah daun yang valid", { id: "Masukkan jumlah daun yang valid" });
       return;
     }
     if (!formData.soilPh || parseFloat(formData.soilPh) < 0 || parseFloat(formData.soilPh) > 14) {
-      toast.error("Masukkan nilai pH tanah yang valid (0-14)");
+      toast.error("Masukkan nilai pH tanah yang valid (0-14)", { id: "Masukkan nilai pH tanah yang valid (0-14)" });
       return;
     }
     if (!formData.lightCondition.trim()) {
-      toast.error("Kondisi cahaya wajib diisi");
+      toast.error("Kondisi cahaya wajib diisi", { id: "Kondisi cahaya wajib diisi" });
       return;
     }
     if (!formData.plantCondition.trim()) {
-      toast.error("Kondisi tanaman wajib diisi");
+      toast.error("Kondisi tanaman wajib diisi", { id: "Kondisi tanaman wajib diisi" });
       return;
     }
     if (!formData.fertilizerType.trim()) {
-      toast.error("Jenis pupuk wajib diisi");
+      toast.error("Jenis pupuk wajib diisi", { id: "Jenis pupuk wajib diisi" });
       return;
     }
     if (!formData.landArea || parseFloat(formData.landArea) <= 0) {
-      toast.error("Luas lahan wajib diisi dan harus lebih dari 0");
+      toast.error("Luas lahan wajib diisi dan harus lebih dari 0", { id: "Luas lahan wajib diisi dan harus lebih dari 0" });
       return;
     }
 
@@ -154,7 +154,7 @@ export default function ObservationForm() {
     try {
       const selectedTracker = trackers.find((t) => t.id === formData.trackerSelect);
       if (!selectedTracker) {
-        toast.error("Tracker tidak ditemukan");
+        toast.error("Tracker tidak ditemukan", { id: "Tracker tidak ditemukan" });
         setSubmitting(false);
         return;
       }
@@ -195,14 +195,14 @@ export default function ObservationForm() {
         throw error;
       }
 
-      toast.success("Data pengamatan berhasil disimpan!");
+      toast.success("Data pengamatan berhasil disimpan!", { id: "Data pengamatan berhasil disimpan!" });
       console.log("Redirecting to:", `/observation/${selectedTracker.plant_type}/history`);
       
       // Redirect to history page
       router.push(`/observation/${selectedTracker.plant_type}/history`);
     } catch (error: any) {
       console.error("Error saving data:", error, JSON.stringify(error));
-      toast.error(`Gagal menyimpan data pengamatan: ${error?.message ?? "Unknown error"}`);
+      toast.error(`Gagal menyimpan data pengamatan: ${error?.message ?? "Unknown error"}`, { id: `Gagal menyimpan data pengamatan: ${error?.message ?? "Unknown error"}` });
       setSubmitting(false);
     }
   };

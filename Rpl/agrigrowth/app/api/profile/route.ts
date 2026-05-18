@@ -63,7 +63,7 @@ const getCurrentUser = async (request: Request) => {
   const { data, error } = await withTimeout(
     anon.auth.getUser(token),
     "Validasi sesi Supabase terlalu lama. Silakan login ulang atau coba lagi.",
-    6000
+    10000
   );
 
   if (error || !data?.user) {
@@ -139,7 +139,7 @@ export async function PATCH(request: Request) {
         .select()
         .single(),
       "Supabase profiles tidak merespons. Cek SUPABASE_SERVICE_ROLE_KEY, network, dan policy/GRANT table profiles.",
-      6000
+      10000
     );
 
     if (error) {
