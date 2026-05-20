@@ -27,7 +27,7 @@ const fadeUpVariant = {
 };
 
 const heroBackground =
-  "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=2000&auto=format&fit=crop";
+  "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=2400&auto=format&fit=crop";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -125,7 +125,9 @@ export default function Home() {
           >
             <span>Get Started</span>
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f3b300] font-bold text-[#1a1a1a] sm:h-11 sm:w-11">
-              ›
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" aria-hidden>
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="#1a1a1a" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </span>
           </motion.button>
         </motion.section>
