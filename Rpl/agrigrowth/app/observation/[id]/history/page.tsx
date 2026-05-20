@@ -506,66 +506,66 @@ export default function ObservationHistory() {
       </header>
 
       {/* Content */}
-      <section className="mx-auto w-full max-w-[1440px] px-5 pb-12 sm:px-10 lg:px-14">
-        <div className="flex flex-wrap items-center justify-between gap-4 mt-2 sm:mt-4">
-          <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-[58px] font-extrabold leading-[1.08] text-[#365a1a]">
+      <section className="mx-auto w-full max-w-[1440px] px-3 sm:px-5 pb-10 sm:pb-12 md:px-10 lg:px-14">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mt-2 sm:mt-4">
+          <h1 className="text-lg sm:text-2xl md:text-4xl lg:text-[58px] font-extrabold leading-[1.08] text-[#365a1a]">
             Monitoring Grafik {trackerTitle}
           </h1>
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Link
               href="/observation/form"
-              className="rounded-full bg-[#365a1a] px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-md hover:bg-[#2d4915] hover:shadow-lg transition"
+              className="rounded-full bg-[#365a1a] px-3 sm:px-6 py-1.5 sm:py-2.5 text-[11px] sm:text-sm font-bold text-white shadow-md hover:bg-[#2d4915] hover:shadow-lg transition"
             >
               ➕ Input
             </Link>
             <button 
               onClick={handleExportPDF}
               disabled={isExporting || !selectedTrackerId || chartData.length === 0}
-              className="rounded-full bg-white px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition disabled:opacity-50"
+              className="rounded-full bg-white px-3 sm:px-6 py-1.5 sm:py-2.5 text-[11px] sm:text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition disabled:opacity-50"
             >
               {isExporting ? "..." : "📥 Export"}
             </button>
-            <button className="rounded-full bg-white px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition">
+            <button className="rounded-full bg-white px-3 sm:px-6 py-1.5 sm:py-2.5 text-[11px] sm:text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition">
               📤
             </button>
           </div>
         </div>
 
-        <div id="pdf-content" className="mt-10 p-2 sm:p-4 bg-[#f4f4f4]">
+        <div id="pdf-content" className="mt-6 sm:mt-10 p-2 sm:p-4 bg-[#f4f4f4]">
           {loading ? (
-            <div className="flex flex-col items-center justify-center rounded-[20px] bg-white py-16 px-6 text-center shadow-sm border border-gray-100">
-              <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#365a1a] border-t-transparent"></div>
-              <p className="mt-4 text-[#365a1a] font-medium">Memuat data lahan...</p>
+            <div className="flex flex-col items-center justify-center rounded-[20px] bg-white py-12 sm:py-16 px-4 sm:px-6 text-center shadow-sm border border-gray-100">
+              <div className="h-8 sm:h-10 w-8 sm:w-10 animate-spin rounded-full border-4 border-[#365a1a] border-t-transparent"></div>
+              <p className="mt-3 sm:mt-4 text-sm sm:text-base text-[#365a1a] font-medium">Memuat data lahan...</p>
             </div>
           ) : trackers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-[30px] border-2 border-dashed border-[#9fb08d] bg-white py-24 px-6 text-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#f0f4eb] mb-6">
-                <span className="text-5xl">🚜</span>
+            <div className="flex flex-col items-center justify-center rounded-[30px] border-2 border-dashed border-[#9fb08d] bg-white py-16 sm:py-24 px-4 sm:px-6 text-center">
+              <div className="flex h-16 sm:h-20 w-16 sm:w-20 items-center justify-center rounded-full bg-[#f0f4eb] mb-4 sm:mb-6">
+                <span className="text-3xl sm:text-5xl">🚜</span>
               </div>
-              <h3 className="text-[24px] font-bold text-[#365a1a]">Belum Ada Data Lahan</h3>
-              <p className="mt-3 text-[16px] text-[#365a1a]/70 max-w-md">
+              <h3 className="text-[20px] sm:text-[24px] font-bold text-[#365a1a]">Belum Ada Data Lahan</h3>
+              <p className="mt-2 sm:mt-3 text-[14px] sm:text-[16px] text-[#365a1a]/70 max-w-md">
                 Anda belum membuat tracker lahan untuk {trackerTitle}. Buat tracker dan mulai input data pengamatan.
               </p>
               <Link
                 href="/dashboard"
-                className="mt-6 inline-block rounded-full bg-[#365a1a] px-8 py-3 text-sm font-bold text-white hover:bg-[#2d4915] transition"
+                className="mt-4 sm:mt-6 inline-block rounded-full bg-[#365a1a] px-6 sm:px-8 py-2 sm:py-3 text-xs sm:text-sm font-bold text-white hover:bg-[#2d4915] transition"
               >
                 Buat Tracker Lahan
               </Link>
             </div>
           ) : !selectedTrackerId ? (
-            <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-8 shadow-sm">
-              <h2 className="mb-6 text-[24px] font-bold sm:text-[28px]">🌾 Pilih Lahan yang Ingin Dimonitor</h2>
-              <p className="text-[#365a1a]/70 mb-6">Anda memiliki {trackers.length} lahan yang telah dicatat untuk {trackerTitle}:</p>
-              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-4 sm:p-8 shadow-sm">
+              <h2 className="mb-4 sm:mb-6 text-[20px] font-bold sm:text-[28px]">🌾 Pilih Lahan yang Ingin Dimonitor</h2>
+              <p className="text-[13px] sm:text-base text-[#365a1a]/70 mb-4 sm:mb-6">Anda memiliki {trackers.length} lahan yang telah dicatat untuk {trackerTitle}:</p>
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {trackers.map((tracker) => (
                   <button
                     key={tracker.id}
                     onClick={() => setSelectedTrackerId(tracker.id)}
-                    className="p-4 rounded-[16px] border-2 border-[#365a1a] bg-gradient-to-br from-[#f0f4eb] to-white hover:bg-[#e8ede0] hover:shadow-md transition text-left"
+                    className="p-3 sm:p-4 rounded-[16px] border-2 border-[#365a1a] bg-gradient-to-br from-[#f0f4eb] to-white hover:bg-[#e8ede0] hover:shadow-md transition text-left"
                   >
-                    <h3 className="font-bold text-[18px] text-[#365a1a] mb-2">{tracker.title}</h3>
-                    <p className="text-sm text-[#365a1a]/60">
+                    <h3 className="font-bold text-[16px] sm:text-[18px] text-[#365a1a] mb-1 sm:mb-2">{tracker.title}</h3>
+                    <p className="text-xs sm:text-sm text-[#365a1a]/60">
                       Dibuat: {new Date(tracker.created_at).toLocaleDateString('id-ID', { 
                         year: 'numeric', 
                         month: 'long', 
@@ -577,25 +577,25 @@ export default function ObservationHistory() {
               </div>
             </div>
           ) : chartData.length > 0 ? (
-            <div className="space-y-8">
-              <div className="flex items-center justify-between rounded-[16px] bg-[#f0f4eb] p-4 border-l-4 border-[#365a1a]">
+            <div className="space-y-6 sm:space-y-8">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between rounded-[16px] bg-[#f0f4eb] p-3 sm:p-4 border-l-4 border-[#365a1a] gap-3 sm:gap-4">
                 <div>
-                  <p className="text-sm text-[#365a1a]/70">Lahan yang dipilih:</p>
-                  <p className="text-[20px] font-bold text-[#365a1a]">{trackers.find(t => t.id === selectedTrackerId)?.title}</p>
+                  <p className="text-[11px] sm:text-sm text-[#365a1a]/70">Lahan yang dipilih:</p>
+                  <p className="text-[16px] sm:text-[20px] font-bold text-[#365a1a]">{trackers.find(t => t.id === selectedTrackerId)?.title}</p>
                 </div>
                 <button
                   onClick={() => setSelectedTrackerId(null)}
-                  className="rounded-full bg-[#365a1a] text-white px-4 py-2 text-sm font-semibold hover:bg-[#2d4915] transition"
+                  className="rounded-full bg-[#365a1a] text-white px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-sm font-semibold hover:bg-[#2d4915] transition"
                 >
                   ← Kembali ke Daftar
                 </button>
               </div>
 
               {/* Tabs */}
-              <div className="flex gap-4 border-b-2 border-gray-200">
+              <div className="flex gap-3 sm:gap-4 border-b-2 border-gray-200 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab("pengamatan")}
-                  className={`pb-2 text-[18px] font-bold transition-all ${
+                  className={`pb-2 text-[14px] sm:text-[18px] font-bold transition-all whitespace-nowrap ${
                     activeTab === "pengamatan" 
                       ? "border-b-4 border-[#365a1a] text-[#365a1a]" 
                       : "text-gray-400 hover:text-[#365a1a]"
@@ -605,7 +605,7 @@ export default function ObservationHistory() {
                 </button>
                 <button
                   onClick={() => setActiveTab("biaya")}
-                  className={`pb-2 text-[18px] font-bold transition-all ${
+                  className={`pb-2 text-[14px] sm:text-[18px] font-bold transition-all whitespace-nowrap ${
                     activeTab === "biaya" 
                       ? "border-b-4 border-[#365a1a] text-[#365a1a]" 
                       : "text-gray-400 hover:text-[#365a1a]"
@@ -618,58 +618,58 @@ export default function ObservationHistory() {
               {activeTab === "pengamatan" && (
                 <>
               {/* Grafik Tinggi Tanaman */}
-              <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-6 shadow-sm">
-                <h2 className="mb-6 text-[20px] font-bold sm:text-[24px]">📊 GRAFIK TINGGI TANAMAN</h2>
-                <div className="h-[300px] w-full">
+              <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-3 sm:p-4 md:p-6 shadow-sm overflow-hidden">
+                <h2 className="mb-3 sm:mb-4 md:mb-6 text-[18px] sm:text-[20px] font-bold md:text-[24px]">📊 GRAFIK TINGGI TANAMAN</h2>
+                <div className="h-[200px] sm:h-[250px] md:h-[300px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                    <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                      <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#365a1a' }} dy={10} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#365a1a' }} dx={-10} unit=" cm" />
+                      <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#365a1a', fontSize: 11 }} dy={5} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#365a1a', fontSize: 11 }} dx={-10} unit=" cm" />
                       <Tooltip 
                         contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
                         labelStyle={{ fontWeight: 'bold', color: '#365a1a' }}
                       />
-                      <Line type="monotone" dataKey="height" name="Tinggi Tanaman" stroke="#365a1a" strokeWidth={4} dot={{ r: 6, fill: '#365a1a', strokeWidth: 0 }} activeDot={{ r: 8 }} />
+                      <Line type="monotone" dataKey="height" name="Tinggi Tanaman" stroke="#365a1a" strokeWidth={3} dot={{ r: 4, fill: '#365a1a', strokeWidth: 0 }} activeDot={{ r: 6 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="mt-6 border-t border-gray-100 pt-4">
-                  <p className="text-[16px] font-semibold text-[#365a1a]">Tren: {stats.avgHeightGrowth >= 0 ? '↑ Meningkat' : '↓ Menurun'} ({stats.avgHeightGrowth.toFixed(2)} cm/hari)</p>
-                  <p className="text-[14px] text-gray-600">Total tinggi terakhir: {stats.endHeight} cm</p>
+                <div className="mt-3 sm:mt-4 md:mt-6 border-t border-gray-100 pt-3 sm:pt-4">
+                  <p className="text-[13px] sm:text-[16px] font-semibold text-[#365a1a]">Tren: {stats.avgHeightGrowth >= 0 ? '↑ Meningkat' : '↓ Menurun'} ({stats.avgHeightGrowth.toFixed(2)} cm/hari)</p>
+                  <p className="text-[12px] sm:text-[14px] text-gray-600">Total tinggi terakhir: {stats.endHeight} cm</p>
                 </div>
               </div>
 
               {/* Grafik Jumlah Daun */}
-              <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-6 shadow-sm">
-                <h2 className="mb-6 text-[20px] font-bold sm:text-[24px]">📊 GRAFIK JUMLAH DAUN</h2>
-                <div className="h-[300px] w-full">
+              <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-3 sm:p-4 md:p-6 shadow-sm overflow-hidden">
+                <h2 className="mb-3 sm:mb-4 md:mb-6 text-[18px] sm:text-[20px] font-bold md:text-[24px]">📊 GRAFIK JUMLAH DAUN</h2>
+                <div className="h-[200px] sm:h-[250px] md:h-[300px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+                    <LineChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
-                      <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#365a1a' }} dy={10} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#365a1a' }} dx={-10} />
+                      <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fill: '#365a1a', fontSize: 11 }} dy={5} />
+                      <YAxis axisLine={false} tickLine={false} tick={{ fill: '#365a1a', fontSize: 11 }} dx={-10} />
                       <Tooltip 
                         contentStyle={{ borderRadius: '12px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}
                         labelStyle={{ fontWeight: 'bold', color: '#365a1a' }}
                       />
-                      <Line type="monotone" dataKey="leaf" name="Jumlah Daun" stroke="#61ae25" strokeWidth={4} dot={{ r: 6, fill: '#61ae25', strokeWidth: 0 }} activeDot={{ r: 8 }} />
+                      <Line type="monotone" dataKey="leaf" name="Jumlah Daun" stroke="#61ae25" strokeWidth={3} dot={{ r: 4, fill: '#61ae25', strokeWidth: 0 }} activeDot={{ r: 6 }} />
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="mt-6 border-t border-gray-100 pt-4">
-                  <p className="text-[16px] font-semibold text-[#365a1a]">Tren: {stats.avgLeafGrowth >= 0 ? '↑ Bertambah' : '↓ Berkurang'} ({stats.avgLeafGrowth.toFixed(2)} daun/hari)</p>
-                  <p className="text-[14px] text-gray-600">Total daun terakhir: {stats.endLeaf} helai</p>
+                <div className="mt-3 sm:mt-4 md:mt-6 border-t border-gray-100 pt-3 sm:pt-4">
+                  <p className="text-[13px] sm:text-[16px] font-semibold text-[#365a1a]">Tren: {stats.avgLeafGrowth >= 0 ? '↑ Bertambah' : '↓ Berkurang'} ({stats.avgLeafGrowth.toFixed(2)} daun/hari)</p>
+                  <p className="text-[12px] sm:text-[14px] text-gray-600">Total daun terakhir: {stats.endLeaf} helai</p>
                 </div>
               </div>
 
               {/* Analisis Pertumbuhan */}
-              <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-6 shadow-sm">
-                <h2 className="mb-6 text-[20px] font-bold sm:text-[24px] uppercase">Analisis Pertumbuhan</h2>
-                <div className="grid gap-8 sm:grid-cols-2">
+              <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-3 sm:p-4 md:p-6 shadow-sm">
+                <h2 className="mb-4 sm:mb-6 text-[18px] sm:text-[20px] font-bold md:text-[24px] uppercase">Analisis Pertumbuhan</h2>
+                <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2">
                   <div>
-                    <h3 className="font-semibold mb-2">Tinggi Tanaman:</h3>
-                    <ul className="space-y-1 text-sm text-[#365a1a]/80">
+                    <h3 className="font-semibold mb-2 text-sm sm:text-base">Tinggi Tanaman:</h3>
+                    <ul className="space-y-1 text-[12px] sm:text-sm text-[#365a1a]/80">
                       <li>• Awal: {stats.startHeight} cm</li>
                       <li>• Akhir: {stats.endHeight} cm</li>
                       <li>• Total pertumbuhan: {(stats.endHeight - stats.startHeight).toFixed(2)} cm</li>
@@ -677,8 +677,8 @@ export default function ObservationHistory() {
                     </ul>
                   </div>
                   <div>
-                    <h3 className="font-semibold mb-2">Jumlah Daun:</h3>
-                    <ul className="space-y-1 text-sm text-[#365a1a]/80">
+                    <h3 className="font-semibold mb-2 text-sm sm:text-base">Jumlah Daun:</h3>
+                    <ul className="space-y-1 text-[12px] sm:text-sm text-[#365a1a]/80">
                       <li>• Awal: {stats.startLeaf} helai</li>
                       <li>• Akhir: {stats.endLeaf} helai</li>
                       <li>• Total pertambahan: {stats.endLeaf - stats.startLeaf} helai</li>
@@ -686,9 +686,9 @@ export default function ObservationHistory() {
                     </ul>
                   </div>
                 </div>
-                <div className="mt-6 border-t border-gray-100 pt-4">
-                  <h3 className="font-semibold mb-2">Kesimpulan:</h3>
-                  <div className="text-sm space-y-1">
+                <div className="mt-4 sm:mt-6 border-t border-gray-100 pt-3 sm:pt-4">
+                  <h3 className="font-semibold mb-1 sm:mb-2 text-sm sm:text-base">Kesimpulan:</h3>
+                  <div className="text-[12px] sm:text-sm space-y-1">
                     <p className="flex items-center gap-2"><span>✓</span> Pertumbuhan tercatat selama {stats.daysSpan} hari dengan baik.</p>
                     <p className="flex items-center gap-2"><span>✓</span> Tidak ada penurunan ekstrim yang tercatat.</p>
                   </div>

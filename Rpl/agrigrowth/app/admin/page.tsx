@@ -91,8 +91,11 @@ export default function AdminDashboardPage() {
           setLastSynced(new Date().toLocaleTimeString("id-ID"));
           setError(null);
         }
-      } catch (err: any) {
-        if (isMounted) setError(err?.message || "Gagal memuat data admin");
+      } catch (err: unknown) {
+        if (isMounted) {
+          const msg = err instanceof Error ? err.message : String(err);
+          setError(msg || "Gagal memuat data admin");
+        }
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -107,10 +110,10 @@ export default function AdminDashboardPage() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public' },
-        (payload) => {
-          // Whenever ANY table in public schema changes, refresh the data
-          if (isMounted) loadData();
-        }
+        () => {
+            // Whenever ANY table in public schema changes, refresh the data
+            if (isMounted) loadData();
+          }
       )
       .subscribe();
 

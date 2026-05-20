@@ -42,15 +42,21 @@ export default function AdminProfilesPage() {
     try {
       const data = await adminFetch("/api/admin/profiles");
       setProfiles(data.profiles || []);
-    } catch (err: any) {
-      setError(err?.message || "Gagal memuat profiles");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal memuat profiles");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadProfiles();
+    let mounted = true;
+    (async () => {
+      if (!mounted) return;
+      await loadProfiles();
+    })();
+    return () => { mounted = false; };
   }, []);
 
   const resetForm = () => {
@@ -94,8 +100,9 @@ export default function AdminProfilesPage() {
 
       resetForm();
       await loadProfiles();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menyimpan profile");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal menyimpan profile");
     }
   };
 
@@ -117,8 +124,9 @@ export default function AdminProfilesPage() {
     try {
       await adminFetch("/api/admin/profiles", { method: "DELETE", json: { id } });
       await loadProfiles();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menghapus profile");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal menghapus profile");
     }
   };
 

@@ -236,30 +236,31 @@ export default function WeatherInfo() {
               <Link
                 href="/profile"
                 className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
-              >
-                <span>{user.name}</span>
-                <img alt="Profile" className="h-8 w-8 object-contain" src={imgProfileAvatar} />
+              </div>
+
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
+                {forecast.map((day) => (
+                  <div key={day.day} className="rounded-[20px] p-4 sm:p-4 text-center shadow-sm">
+                    <div className="text-xs sm:text-[16px] font-bold text-[#365a1a] truncate">{day.day}</div>
+                    <div className="mt-2 sm:mt-3 flex justify-center text-[#365a1a]">
+                      <WeatherGlyph code={day.weatherCode} className="h-6 w-6 sm:h-9 sm:w-9 object-contain" />
+                    </div>
+                    <p className="mt-2 sm:mt-3 text-[11px] sm:text-[13px] font-semibold text-[#365a1a] line-clamp-2">{day.condition}</p>
+                    <p className="mt-1 text-[11px] sm:text-[13px] text-[#365a1a]/70">
+                      <span className="font-bold">{day.high}°C</span> / {day.low}°C
+                    </p>
+                  </div>
+                ))}
+              </div>
+                Login / Sign Up
               </Link>
-              <button
-                onClick={handleLogout}
-                className="text-sm font-bold text-[#365a1a] transition hover:opacity-80"
-              >
-                {isLoggingOut ? "Keluar..." : "Logout"}
-              </button>
             </div>
-          ) : (
-            <Link
-              href="/"
-              className="rounded-full bg-[#365a1a] px-5 py-2 text-[16px] font-medium text-white shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:bg-[#2d4915] sm:text-[18px]"
-            >
-              Login / Sign Up
-            </Link>
           )
         ) : null}
       </header>
 
       <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 px-5 pb-12 pt-6 sm:px-10 lg:px-14 lg:pt-8">
-        <article className="grid gap-5 lg:grid-cols-[383px_1fr] lg:items-stretch">
+        <article className="grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-[383px_1fr] lg:items-stretch">
           <div className="rounded-[50px] border-[3px] border-[rgba(54,90,26,0.75)] bg-white px-6 py-7 shadow-[0_20px_55px_rgba(54,90,26,0.12)] sm:px-8 sm:py-8">
             <div className="flex h-full flex-col items-center justify-center text-center">
               <WeatherGlyph code={currentCode} className="h-14 w-14 text-[#365a1a] sm:h-16 sm:w-16" />
@@ -321,7 +322,7 @@ export default function WeatherInfo() {
           </div>
         </article>
 
-        <form onSubmit={handleSearchLocation} className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
+        <form onSubmit={handleSearchLocation} className="grid gap-3 grid-cols-1 sm:grid-cols-[1fr_auto] lg:grid-cols-[1fr_auto_auto]">
           <div className="flex items-center gap-3 rounded-full border-2 border-[rgba(54,90,26,0.25)] bg-white px-5 py-3 shadow-sm">
             <Search className="h-5 w-5 shrink-0 text-[#365a1a]/70" strokeWidth={2} />
             <input
@@ -385,24 +386,25 @@ export default function WeatherInfo() {
               Error: {error}
             </div>
           ) : hourlyItems.length > 0 ? (
-            <div className="mt-5 grid grid-flow-col gap-4 overflow-x-auto pb-2 lg:grid-cols-7 lg:overflow-visible">
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
               {hourlyItems.map((hour) => (
                 <div
                   key={hour.label}
-                  className="min-w-[114px] rounded-[24px] border border-[#dfe8d2] bg-[#fbfcf8] px-3 py-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  className="rounded-[24px] border border-[#dfe8d2] bg-[#fbfcf8] px-2 py-3 sm:px-3 sm:py-4 text-center shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
                 >
-                  <div className="text-[18px] font-bold text-[#365a1a]">{hour.label}</div>
-                  <div className="mt-3 flex justify-center text-[#365a1a]">
-                    <WeatherGlyph code={hour.code} className="h-9 w-9 object-contain" />
+                  <div className="text-xs sm:text-[18px] font-bold text-[#365a1a]">{hour.label}</div>
+                  <div className="mt-2 sm:mt-3 flex justify-center text-[#365a1a]">
+                    <WeatherGlyph code={hour.code} className="h-6 w-6 sm:h-9 sm:w-9 object-contain" />
                   </div>
-                  <div className="mt-2 text-[26px] font-semibold leading-none text-[#365a1a]">{hour.temperature}°</div>
-                  <div className="mt-3 space-y-1 text-[12px] text-[#365a1a]/70">
-                    <p className="inline-flex items-center justify-center gap-1">
-                      <Droplets className="h-3.5 w-3.5" />
-                      {hour.precipitation.toFixed(1)} mm
+                  <div className="mt-1 sm:mt-2 text-lg sm:text-[26px] font-semibold leading-none text-[#365a1a]">{hour.temperature}°</div>
+                  <div className="mt-2 sm:mt-3 space-y-0.5 sm:space-y-1 text-[10px] sm:text-[12px] text-[#365a1a]/70">
+                    <p className="inline-flex items-center justify-center gap-0.5 sm:gap-1">
+                      <Droplets className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
+                      <span className="hidden sm:inline">{hour.precipitation.toFixed(1)} mm</span>
+                      <span className="sm:hidden">{hour.precipitation.toFixed(0)} mm</span>
                     </p>
-                    <p className="inline-flex items-center justify-center gap-1">
-                      <Wind className="h-3.5 w-3.5" />
+                    <p className="inline-flex items-center justify-center gap-0.5 sm:gap-1">
+                      <Wind className="h-2.5 w-2.5 sm:h-3.5 sm:w-3.5" />
                       {hour.windSpeed} km/h
                     </p>
                   </div>
@@ -416,40 +418,40 @@ export default function WeatherInfo() {
           )}
         </section>
 
-        <section className="grid gap-4 md:grid-cols-3 xl:grid-cols-4">
-          <div className="rounded-[28px] border-2 border-[#365a1a] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-            <div className="flex items-center gap-3 text-[#365a1a]/70">
-              <Droplets className="h-5 w-5" />
-              <span className="text-sm font-semibold">Kelembaban</span>
+        <section className="grid gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <div className="rounded-[28px] border-2 border-[#365a1a] bg-white p-4 sm:p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <div className="flex items-center gap-2 sm:gap-3 text-[#365a1a]/70">
+              <Droplets className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-xs sm:text-sm font-semibold">Kelembaban</span>
             </div>
-            <div className="mt-3 text-[38px] font-bold leading-none text-[#365a1a]">{current ? `${current.humidity}%` : "--"}</div>
+            <div className="mt-2 sm:mt-3 text-2xl sm:text-[38px] font-bold leading-none text-[#365a1a]">{current ? `${current.humidity}%` : "--"}</div>
           </div>
 
-          <div className="rounded-[28px] border-2 border-[#365a1a] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-            <div className="flex items-center gap-3 text-[#365a1a]/70">
-              <Wind className="h-5 w-5" />
-              <span className="text-sm font-semibold">Kecepatan Angin</span>
+          <div className="rounded-[28px] border-2 border-[#365a1a] bg-white p-4 sm:p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <div className="flex items-center gap-2 sm:gap-3 text-[#365a1a]/70">
+              <Wind className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-xs sm:text-sm font-semibold">Angin</span>
             </div>
-            <div className="mt-3 text-[38px] font-bold leading-none text-[#365a1a]">{current ? current.windSpeed : "--"}</div>
-            <p className="mt-2 text-sm text-[#365a1a]/70">km/h</p>
+            <div className="mt-2 sm:mt-3 text-2xl sm:text-[38px] font-bold leading-none text-[#365a1a]">{current ? current.windSpeed : "--"}</div>
+            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-[#365a1a]/70">km/h</p>
           </div>
 
-          <div className="rounded-[28px] border-2 border-[#365a1a] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-            <div className="flex items-center gap-3 text-[#365a1a]/70">
-              <Gauge className="h-5 w-5" />
-              <span className="text-sm font-semibold">Tekanan</span>
+          <div className="rounded-[28px] border-2 border-[#365a1a] bg-white p-4 sm:p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <div className="flex items-center gap-2 sm:gap-3 text-[#365a1a]/70">
+              <Gauge className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-xs sm:text-sm font-semibold">Tekanan</span>
             </div>
-            <div className="mt-3 text-[38px] font-bold leading-none text-[#365a1a]">{current ? Math.round(current.pressure) : "--"}</div>
-            <p className="mt-2 text-sm text-[#365a1a]/70">mb</p>
+            <div className="mt-2 sm:mt-3 text-2xl sm:text-[38px] font-bold leading-none text-[#365a1a]">{current ? Math.round(current.pressure) : "--"}</div>
+            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-[#365a1a]/70">mb</p>
           </div>
 
-          <div className="rounded-[28px] border-2 border-[#365a1a] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md md:col-span-3 xl:col-span-1">
-            <div className="flex items-center gap-3 text-[#365a1a]/70">
-              <Eye className="h-5 w-5" />
-              <span className="text-sm font-semibold">Visibilitas</span>
+          <div className="rounded-[28px] border-2 border-[#365a1a] bg-white p-4 sm:p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md col-span-2 sm:col-span-1">
+            <div className="flex items-center gap-2 sm:gap-3 text-[#365a1a]/70">
+              <Eye className="h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="text-xs sm:text-sm font-semibold">Visibilitas</span>
             </div>
-            <div className="mt-3 text-[38px] font-bold leading-none text-[#365a1a]">{current ? current.visibility : "--"}</div>
-            <p className="mt-2 text-sm text-[#365a1a]/70">km</p>
+            <div className="mt-2 sm:mt-3 text-2xl sm:text-[38px] font-bold leading-none text-[#365a1a]">{current ? current.visibility : "--"}</div>
+            <p className="mt-1 sm:mt-2 text-xs sm:text-sm text-[#365a1a]/70">km</p>
           </div>
         </section>
 
@@ -466,16 +468,16 @@ export default function WeatherInfo() {
                 Refresh
               </button>
             </div>
-
+3 grid-cols-2 sm:grid-cols-3
             <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
-              {forecast.map((day) => (
-                <div key={`${day.day}-${day.weatherCode}`} className="rounded-[24px] border border-[#dfe8d2] bg-[#fbfcf8] p-4 text-center shadow-sm">
-                  <div className="text-[16px] font-bold text-[#365a1a]">{day.day}</div>
-                  <div className="mt-3 flex justify-center text-[#365a1a]">
-                    <WeatherGlyph code={day.weatherCode} className="h-9 w-9 object-contain" />
+              {forecast.map((day) => (3 sm:p-4 text-center shadow-sm">
+                  <div className="text-xs sm:text-[16px] font-bold text-[#365a1a] truncate">{day.day}</div>
+                  <div className="mt-2 sm:mt-3 flex justify-center text-[#365a1a]">
+                    <WeatherGlyph code={day.weatherCode} className="h-6 w-6 sm:h-9 sm:w-9 object-contain" />
                   </div>
-                  <p className="mt-3 text-[13px] font-semibold text-[#365a1a]">{day.condition}</p>
-                  <p className="mt-1 text-[13px] text-[#365a1a]/70">
+                  <p className="mt-2 sm:mt-3 text-[11px] sm:text-[13px] font-semibold text-[#365a1a] line-clamp-2">{day.condition}</p>
+                  <p className="mt-1 text-[11px] sm:text-[13px] text-[#365a1a]/70">
+                    <span className="font-bold">{day.high}°</span> / {day.low}°
                     <span className="font-bold">{day.high}°C</span> / {day.low}°C
                   </p>
                 </div>

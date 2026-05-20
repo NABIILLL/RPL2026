@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { adminFetch } from "@/app/admin/_lib/adminApi";
 
+type AdminUser = { id: string; user_metadata?: { name?: string | null } | null; email?: string | null };
+type SimpleProfile = { id: string; name?: string | null };
+
 type Tracker = {
   id: string;
   user_id: string;
@@ -40,21 +43,27 @@ export default function AdminTrackersPage() {
       const users = userData.users || [];
       const newProfileMap = new Map<string, string>();
       
-      users.forEach((u: any) => {
-         const p = profiles.find((p: any) => p.id === u.id);
-         newProfileMap.set(u.id, p?.name || u.user_metadata?.name || u.email || "User");
+      users.forEach((u: AdminUser) => {
+        const p = profiles.find((p: SimpleProfile) => p.id === u.id);
+        newProfileMap.set(u.id, p?.name || u.user_metadata?.name || u.email || "User");
       });
       setProfileMap(newProfileMap);
 
-    } catch (err: any) {
-      setError(err?.message || "Gagal memuat tracker");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal memuat tracker");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadTrackers();
+    let mounted = true;
+    (async () => {
+      if (!mounted) return;
+      await loadTrackers();
+    })();
+    return () => { mounted = false; };
   }, []);
 
   const handleSubmit = async () => {
@@ -80,8 +89,9 @@ export default function AdminTrackersPage() {
       setForm({ ...emptyForm });
       setEditingId(null);
       await loadTrackers();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menyimpan tracker");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal menyimpan tracker");
     }
   };
 
@@ -100,8 +110,9 @@ export default function AdminTrackersPage() {
     try {
       await adminFetch("/api/admin/trackers", { method: "DELETE", json: { id } });
       await loadTrackers();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menghapus tracker");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal menghapus tracker");
     }
   };
 

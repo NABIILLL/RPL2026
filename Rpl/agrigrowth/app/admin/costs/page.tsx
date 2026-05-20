@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { adminFetch } from "@/app/admin/_lib/adminApi";
 
+type AdminUser = { id: string; user_metadata?: { name?: string | null } | null; email?: string | null };
+type SimpleProfile = { id: string; name?: string | null };
+type TrackerRow = { id: string; user_id: string };
+
 type ProductionCost = {
   id: string;
   tracker_id: string;
@@ -51,28 +55,34 @@ export default function AdminCostsPage() {
       const users = userData.users || [];
       const newProfileMap = new Map<string, string>();
       
-      users.forEach((u: any) => {
-         const p = profiles.find((p: any) => p.id === u.id);
-         newProfileMap.set(u.id, p?.name || u.user_metadata?.name || u.email || "User");
+      users.forEach((u: AdminUser) => {
+        const p = profiles.find((p: SimpleProfile) => p.id === u.id);
+        newProfileMap.set(u.id, p?.name || u.user_metadata?.name || u.email || "User");
       });
       setProfileMap(newProfileMap);
 
       const trackers = trackerData.trackers || [];
       const newTrackerMap = new Map<string, string>();
-      trackers.forEach((t: any) => {
-         newTrackerMap.set(t.id, t.user_id);
+      trackers.forEach((t: TrackerRow) => {
+        newTrackerMap.set(t.id, t.user_id);
       });
       setTrackerUserMap(newTrackerMap);
 
-    } catch (err: any) {
-      setError(err?.message || "Gagal memuat daftar biaya");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal memuat daftar biaya");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadCosts();
+    let mounted = true;
+    (async () => {
+      if (!mounted) return;
+      await loadCosts();
+    })();
+    return () => { mounted = false; };
   }, []);
 
   const handleSubmit = async () => {
@@ -106,8 +116,9 @@ export default function AdminCostsPage() {
       setForm({ ...emptyForm, date: form.date }); // keep the date for convenience
       setEditingId(null);
       await loadCosts();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menyimpan biaya");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal menyimpan biaya");
     }
   };
 
@@ -128,8 +139,9 @@ export default function AdminCostsPage() {
     try {
       await adminFetch("/api/admin/costs", { method: "DELETE", json: { id } });
       await loadCosts();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menghapus biaya");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal menghapus biaya");
     }
   };
 

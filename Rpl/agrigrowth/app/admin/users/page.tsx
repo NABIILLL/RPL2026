@@ -45,15 +45,21 @@ export default function AdminUsersPage() {
       setUsers(data.users || []);
       setRoles(data.roles || []);
       setProfiles(data.profiles || []);
-    } catch (err: any) {
-      setError(err?.message || "Gagal memuat pengguna");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal memuat pengguna");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadUsers();
+    let mounted = true;
+    (async () => {
+      if (!mounted) return;
+      await loadUsers();
+    })();
+    return () => { mounted = false; };
   }, []);
 
   const handleSubmit = async () => {
@@ -94,8 +100,9 @@ export default function AdminUsersPage() {
       setForm({ ...emptyForm });
       setEditingId(null);
       await loadUsers();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menyimpan pengguna");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal menyimpan pengguna");
     }
   };
 
@@ -115,8 +122,9 @@ export default function AdminUsersPage() {
     try {
       await adminFetch("/api/admin/users", { method: "DELETE", json: { id } });
       await loadUsers();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menghapus pengguna");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal menghapus pengguna");
     }
   };
 

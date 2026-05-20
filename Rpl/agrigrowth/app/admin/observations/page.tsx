@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { adminFetch } from "@/app/admin/_lib/adminApi";
 
+type AdminUser = { id: string; user_metadata?: { name?: string | null } | null; email?: string | null };
+type SimpleProfile = { id: string; name?: string | null };
+type TrackerRow = { id: string; user_id: string };
+
 type Observation = {
   id: string;
   tracker_id: string;
@@ -45,28 +49,34 @@ export default function AdminObservationsPage() {
       const users = userData.users || [];
       const newProfileMap = new Map<string, string>();
       
-      users.forEach((u: any) => {
-         const p = profiles.find((p: any) => p.id === u.id);
-         newProfileMap.set(u.id, p?.name || u.user_metadata?.name || u.email || "User");
+      users.forEach((u: AdminUser) => {
+        const p = profiles.find((p: SimpleProfile) => p.id === u.id);
+        newProfileMap.set(u.id, p?.name || u.user_metadata?.name || u.email || "User");
       });
       setProfileMap(newProfileMap);
 
       const trackers = trackerData.trackers || [];
       const newTrackerMap = new Map<string, string>();
-      trackers.forEach((t: any) => {
-         newTrackerMap.set(t.id, t.user_id);
+      trackers.forEach((t: TrackerRow) => {
+        newTrackerMap.set(t.id, t.user_id);
       });
       setTrackerUserMap(newTrackerMap);
 
-    } catch (err: any) {
-      setError(err?.message || "Gagal memuat observasi");
+     } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal memuat observasi");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadObservations();
+    let mounted = true;
+    (async () => {
+      if (!mounted) return;
+      await loadObservations();
+    })();
+    return () => { mounted = false; };
   }, []);
 
   const handleSubmit = async () => {
@@ -99,8 +109,9 @@ export default function AdminObservationsPage() {
       setForm({ ...emptyForm });
       setEditingId(null);
       await loadObservations();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menyimpan observasi");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal menyimpan observasi");
     }
   };
 
@@ -120,8 +131,9 @@ export default function AdminObservationsPage() {
     try {
       await adminFetch("/api/admin/observations", { method: "DELETE", json: { id } });
       await loadObservations();
-    } catch (err: any) {
-      setError(err?.message || "Gagal menghapus observasi");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError(msg || "Gagal menghapus observasi");
     }
   };
 

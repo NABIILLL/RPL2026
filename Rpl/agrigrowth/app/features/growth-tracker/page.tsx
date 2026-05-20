@@ -62,19 +62,19 @@ export default function GrowthTracker() {
       </header>
 
       {/* Content */}
-      <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-5 pb-12 pt-6 sm:px-10 lg:px-14 lg:pt-8">
+      <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 sm:gap-8 px-4 sm:px-5 pb-10 sm:pb-12 pt-4 sm:pt-6 md:px-10 lg:px-14 lg:pt-8">
         {/* Hero Section */}
-        <article className="rounded-[30px] bg-white p-5 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)] sm:p-6">
-          <div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
-            <div className="h-[190px] w-full overflow-hidden rounded-[20px] md:h-[273px] md:max-w-[605px]">
+        <article className="rounded-[20px] sm:rounded-[30px] bg-white p-4 sm:p-5 md:p-6 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)]">
+          <div className="flex flex-col gap-4 sm:gap-5 md:flex-row md:items-center md:gap-8">
+            <div className="h-[150px] sm:h-[190px] w-full overflow-hidden rounded-[16px] sm:rounded-[20px] md:h-[273px] md:max-w-[605px]">
               <img alt="Growth Tracker" className="h-full w-full object-cover" src={imgGrowthTrackerImage} />
             </div>
 
             <div className="w-full md:max-w-[578px]">
-              <h1 className="text-[42px] font-extrabold leading-[1.05] text-[#365a1a] lg:text-[60px]">
+              <h1 className="text-[32px] sm:text-[42px] font-extrabold leading-[1.05] text-[#365a1a] lg:text-[60px]">
                 Growth Tracker
               </h1>
-              <p className="mt-3 text-[15px] font-medium leading-[1.35] text-[#365a1a] lg:text-[18px]">
+              <p className="mt-2 sm:mt-3 text-[13px] sm:text-[15px] font-medium leading-[1.35] text-[#365a1a] lg:text-[18px]">
                 Berfungsi sebagai buku catatan digital untuk memasukkan data fisik tanaman secara berkala, meliputi parameter tinggi tanaman, jumlah daun, jumlah cabang, hingga kondisi visual tanaman di lapangan. Melakukan pemrosesan data secara otomatis untuk menghasilkan nilai statistik tanpa pengolahan manual.
               </p>
             </div>
@@ -82,10 +82,10 @@ export default function GrowthTracker() {
         </article>
 
         {/* Features List */}
-        <div className="rounded-[30px] bg-white p-6 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)] sm:p-8">
-          <h2 className="text-[32px] font-bold sm:text-[40px]">Fitur Growth Tracker</h2>
+        <div className="rounded-[20px] sm:rounded-[30px] bg-white p-4 sm:p-6 md:p-8 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)]">
+          <h2 className="text-[24px] sm:text-[32px] font-bold md:text-[40px]">Fitur Growth Tracker</h2>
 
-          <div className="mt-6 grid gap-6 sm:grid-cols-2">
+          <div className="mt-4 sm:mt-6 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
             {[
               {
                 title: "Pencatatan Data Berkala",
@@ -114,12 +114,12 @@ export default function GrowthTracker() {
             ].map((feature, index) => (
               <div
                 key={index}
-                className="rounded-[20px] border-2 border-[#365a1a] p-4 sm:p-6"
+                className="rounded-[16px] sm:rounded-[20px] border-2 border-[#365a1a] p-3 sm:p-4 md:p-6"
               >
-                <h3 className="text-[18px] font-bold text-[#365a1a] sm:text-[20px]">
+                <h3 className="text-[16px] sm:text-[18px] font-bold text-[#365a1a] md:text-[20px]">
                   {feature.title}
                 </h3>
-                <p className="mt-2 text-[14px] text-[#365a1a]/80 sm:text-[16px]">
+                <p className="mt-1 sm:mt-2 text-[12px] sm:text-[14px] text-[#365a1a]/80 md:text-[16px]">
                   {feature.description}
                 </p>
               </div>
@@ -128,14 +128,14 @@ export default function GrowthTracker() {
         </div>
 
         {/* CTA Section */}
-        <div className="rounded-[30px] bg-[#365a1a] p-6 text-center text-white sm:p-8">
-          <h2 className="text-[28px] font-bold sm:text-[36px]">Mulai Tracking Tanaman Anda</h2>
-          <p className="mt-3 text-[16px] sm:text-[18px]">
+        <div className="rounded-[20px] sm:rounded-[30px] bg-[#365a1a] p-4 sm:p-6 md:p-8 text-center text-white">
+          <h2 className="text-[20px] sm:text-[28px] font-bold md:text-[36px]">Mulai Tracking Tanaman Anda</h2>
+          <p className="mt-2 sm:mt-3 text-[14px] sm:text-[16px] md:text-[18px]">
             Catat data tanaman Anda secara berkala dan dapatkan insight yang akurat
           </p>
           <Link
             href="/dashboard"
-            className="mt-6 inline-block rounded-full bg-white px-8 py-3 text-[14px] font-semibold text-[#365a1a] transition hover:bg-gray-100 sm:text-[16px]"
+            className="mt-4 sm:mt-6 inline-block rounded-full bg-white px-6 sm:px-8 py-2 sm:py-3 text-[12px] sm:text-[14px] font-semibold text-[#365a1a] transition hover:bg-gray-100 md:text-[16px]"
           >
             Buka Dashboard
           </Link>
@@ -144,7 +144,7 @@ export default function GrowthTracker() {
         {/* Back Button */}
         <Link
           href="/wireframe4"
-          className="inline-block rounded-full bg-[#365a1a] px-6 py-3 text-[14px] font-semibold text-white transition hover:bg-[#2d4915]"
+          className="inline-block rounded-full bg-[#365a1a] px-4 sm:px-6 py-2 sm:py-3 text-[12px] sm:text-[14px] font-semibold text-white transition hover:bg-[#2d4915]"
         >
           ← Kembali ke Features
         </Link>
