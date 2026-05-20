@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { useUser } from "@/hooks/useUser";
 import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import AgrigrowthLogo from "@/components/AgrigrowthLogo";
+import { Menu, X } from "lucide-react";
 import "./admin.css";
 
 const navSections = [
@@ -38,6 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, isLoading } = useUser();
   const pathname = usePathname();
   const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const current = flattenNav.find((item) => item.href === pathname);
   const currentLabel = current?.label ?? "Dashboard";
   const adminName = user?.name || "Admin";
@@ -83,10 +86,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="admin-app">
       <div className="app">
-        <aside className="sidebar">
+        <aside className={`sidebar${sidebarOpen ? " mobile-open" : ""}`}>
           <div className="sidebar-logo">
             <AgrigrowthLogo tone="light" textClassName="logo-text" />
             <div className="env-badge"><div className="env-dot"></div> Production</div>
+            <button
+              className="sidebar-close-btn"
+              onClick={() => setSidebarOpen(false)}
+              aria-label="Close sidebar"
+            >
+              <X size={20} />
+            </button>
           </div>
 
           {navSections.map((section) => (
@@ -97,6 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   key={item.href}
                   href={item.href}
                   className={`nav-item${pathname === item.href ? " active" : ""}`}
+                  onClick={() => setSidebarOpen(false)}
                 >
                   <i className={item.icon}></i>
                   {item.label}
@@ -134,6 +145,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <div className="main">
           <div className="topbar">
+            <button
+              className="topbar-menu-btn"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              aria-label="Toggle sidebar"
+            >
+              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
             <div className="topbar-breadcrumb">Admin <i className="ti ti-chevron-right" style={{ fontSize: 12 }}></i> <span>{currentLabel}</span></div>
             <div className="topbar-search">
               <i className="ti ti-search"></i>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-
+import { Menu, X } from "lucide-react";
 import { useUser } from "@/hooks/useUser";
 import AuthModal from "@/components/AuthModal";
 import { useState } from "react";
@@ -13,6 +13,7 @@ const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%233
 export default function About() {
   const { user, isLoading } = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const { logout: handleLogout, isLoggingOut } = useLogoutConfirm();
 
   return (
@@ -37,25 +38,71 @@ export default function About() {
           </Link>
         </nav>
 
-        {!isLoading && (
-          user ? (
-            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 md:gap-4">
-              <Link
-                href="/profile"
-                className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90"
-              >
-                <span>{user.name}</span>
-                <img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgProfile} />
-              </Link>
-              <button onClick={handleLogout} disabled={isLoggingOut} className="text-xs sm:text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
-                {isLoggingOut ? "Keluar..." : "Logout"}
+        <div className="flex items-center gap-3">
+          {!isLoading && (
+            user ? (
+              <div className="hidden sm:flex flex-col sm:flex-row items-center gap-2 sm:gap-3 md:gap-4">
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90"
+                >
+                  <span>{user.name}</span>
+                  <img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgProfile} />
+                </Link>
+                <button onClick={handleLogout} disabled={isLoggingOut} className="text-xs sm:text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
+                  {isLoggingOut ? "Keluar..." : "Logout"}
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => setIsModalOpen(true)} className="hidden sm:block rounded-full bg-[#365a1a] px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base font-medium text-white shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] hover:bg-[#2d4915] transition">
+                Login / Sign Up
               </button>
+            )
+          )}
+
+          {/* Mobile menu toggle */}
+          <button
+            aria-label="Toggle menu"
+            onClick={() => setMobileOpen((s) => !s)}
+            className="inline-flex items-center justify-center rounded-md p-2 text-[#365a1a] sm:hidden"
+          >
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
+
+        {/* Mobile menu panel */}
+        {mobileOpen && (
+          <div className="sm:hidden absolute right-4 top-16 z-20 w-64 rounded-md bg-white border border-[#e0e0e0] p-4 shadow-lg">
+            <nav className="flex flex-col gap-3">
+              <Link onClick={() => setMobileOpen(false)} className="text-base font-semibold text-[#365a1a] hover:opacity-80" href={user ? "/dashboard" : "/"}>Home</Link>
+              <Link onClick={() => setMobileOpen(false)} className="text-base font-semibold text-[#365a1a] hover:opacity-80" href="/about">About</Link>
+              <Link onClick={() => setMobileOpen(false)} className="text-base font-semibold text-[#365a1a] hover:opacity-80" href="/wireframe4">Features</Link>
+            </nav>
+
+            <div className="mt-3 border-t border-[#e0e0e0] pt-3">
+              {!isLoading ? (
+                user ? (
+                  <div className="flex flex-col gap-2">
+                    <Link onClick={() => setMobileOpen(false)} href="/profile" className="flex items-center gap-2 rounded-md px-3 py-2 bg-[rgba(54,90,26,0.9)] text-white">
+                      <img alt="Profile" loading="lazy" className="h-5 w-5 object-contain" src={imgProfile} />
+                      <span className="font-medium">{user.name}</span>
+                    </Link>
+                    <button onClick={() => { setMobileOpen(false); handleLogout(); }} className="text-left text-sm font-semibold text-[#365a1a]">{isLoggingOut ? 'Keluar...' : 'Logout'}</button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false);
+                      setIsModalOpen(true);
+                    }}
+                    className="w-full rounded-full bg-[#365a1a] px-3 py-2 text-sm font-medium text-white hover:bg-[#2d4915] transition"
+                  >
+                    Login / Sign Up
+                  </button>
+                )
+              ) : null}
             </div>
-          ) : (
-            <button onClick={() => setIsModalOpen(true)} className="rounded-full bg-[#365a1a] px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base font-medium text-white shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] hover:bg-[#2d4915] transition">
-              Login / Sign Up
-            </button>
-          )
+          </div>
         )}
       </header>
 
