@@ -236,24 +236,22 @@ export default function WeatherInfo() {
               <Link
                 href="/profile"
                 className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
-              </div>
-
-              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
-                {forecast.map((day) => (
-                  <div key={day.day} className="rounded-[20px] p-4 sm:p-4 text-center shadow-sm">
-                    <div className="text-xs sm:text-[16px] font-bold text-[#365a1a] truncate">{day.day}</div>
-                    <div className="mt-2 sm:mt-3 flex justify-center text-[#365a1a]">
-                      <WeatherGlyph code={day.weatherCode} className="h-6 w-6 sm:h-9 sm:w-9 object-contain" />
-                    </div>
-                    <p className="mt-2 sm:mt-3 text-[11px] sm:text-[13px] font-semibold text-[#365a1a] line-clamp-2">{day.condition}</p>
-                    <p className="mt-1 text-[11px] sm:text-[13px] text-[#365a1a]/70">
-                      <span className="font-bold">{day.high}°C</span> / {day.low}°C
-                    </p>
-                  </div>
-                ))}
-              </div>
-                Login / Sign Up
+              >
+                <span className="hidden sm:inline">{user?.name || "Profile"}</span>
+                <img alt="Profile" className="h-8 w-8 rounded-full object-contain" src={imgProfileAvatar} />
               </Link>
+
+              <button
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition"
+              >
+                {isLoggingOut ? "Keluar..." : "Logout"}
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link href="/auth" className="text-sm font-semibold text-[#365a1a]">Login / Sign Up</Link>
             </div>
           )
         ) : null}
@@ -468,16 +466,16 @@ export default function WeatherInfo() {
                 Refresh
               </button>
             </div>
-3 grid-cols-2 sm:grid-cols-3
+
             <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7">
-              {forecast.map((day) => (3 sm:p-4 text-center shadow-sm">
+              {forecast.map((day) => (
+                <div key={day.day} className="rounded-[20px] p-4 sm:p-4 text-center shadow-sm">
                   <div className="text-xs sm:text-[16px] font-bold text-[#365a1a] truncate">{day.day}</div>
                   <div className="mt-2 sm:mt-3 flex justify-center text-[#365a1a]">
                     <WeatherGlyph code={day.weatherCode} className="h-6 w-6 sm:h-9 sm:w-9 object-contain" />
                   </div>
                   <p className="mt-2 sm:mt-3 text-[11px] sm:text-[13px] font-semibold text-[#365a1a] line-clamp-2">{day.condition}</p>
                   <p className="mt-1 text-[11px] sm:text-[13px] text-[#365a1a]/70">
-                    <span className="font-bold">{day.high}°</span> / {day.low}°
                     <span className="font-bold">{day.high}°C</span> / {day.low}°C
                   </p>
                 </div>
