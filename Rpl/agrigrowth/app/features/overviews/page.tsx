@@ -2,11 +2,25 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useUser } from "@/hooks/useUser";
 import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import { supabase } from "@/lib/supabase";
 import { toast } from "react-hot-toast";
 import { Trash2 } from "lucide-react";
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 70, damping: 15 } }
+};
 
 const imgRice2 = "https://images.unsplash.com/photo-1530507629858-e4977d30e9e0?q=80&w=800&auto=format&fit=crop";
 const imgDownload41 = "https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=800&auto=format&fit=crop";
@@ -105,7 +119,7 @@ export default function Overviews() {
           <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
         </Link>
 
-        <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-10 text-[21px] font-bold lg:flex">
           <Link href="/dashboard" className="hover:opacity-80 transition">
             Home
           </Link>
@@ -146,9 +160,14 @@ export default function Overviews() {
       </header>
 
       {/* Content */}
-      <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 sm:gap-8 px-4 sm:px-5 pb-10 sm:pb-12 pt-4 sm:pt-6 md:px-10 lg:px-14 lg:pt-8">
+      <motion.section 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 sm:gap-8 px-4 sm:px-5 pb-10 sm:pb-12 pt-4 sm:pt-6 md:px-10 lg:px-14 lg:pt-8"
+      >
         {/* Hero Section */}
-        <article className="rounded-[20px] sm:rounded-[30px] bg-white p-4 sm:p-5 md:p-6 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)]">
+        <motion.article variants={fadeUpVariant} className="rounded-[20px] sm:rounded-[30px] bg-white p-4 sm:p-5 md:p-6 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)]">
           <div className="flex flex-col gap-4 sm:gap-5 md:flex-row md:items-center md:gap-8">
             <div className="h-[150px] sm:h-[190px] w-full overflow-hidden rounded-[16px] sm:rounded-[20px] md:h-[273px] md:max-w-[605px]">
               <img alt="Overviews" loading="lazy" className="h-full w-full object-cover" src={imgOverviewImage} />
@@ -163,10 +182,10 @@ export default function Overviews() {
               </p>
             </div>
           </div>
-        </article>
+        </motion.article>
 
         {/* Overview Cards or Empty State */}
-        <div className="rounded-[20px] sm:rounded-[30px] bg-white p-4 sm:p-6 md:p-8 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)]">
+        <motion.div variants={fadeUpVariant} className="rounded-[20px] sm:rounded-[30px] bg-white p-4 sm:p-6 md:p-8 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)]">
           <h2 className="text-[24px] sm:text-[32px] font-bold md:text-[40px]">Ringkasan Lahan Anda</h2>
 
           {loading ? (
@@ -251,7 +270,7 @@ export default function Overviews() {
               ))}
             </div>
           )}
-        </div>
+        </motion.div>
 
         {/* Back Button */}
         <Link
@@ -260,7 +279,7 @@ export default function Overviews() {
         >
           ← Kembali ke Features
         </Link>
-      </section>
+      </motion.section>
     </main>
   );
 }

@@ -3,10 +3,25 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ChevronDown, Calendar, ThermometerSun, Leaf, Ruler, Scale } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { motion } from "framer-motion";
 import { useUser } from "@/hooks/useUser";
 import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import { toast } from "react-hot-toast";
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 70, damping: 15 } }
+};
 
 const imgLogo = "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=800&auto=format&fit=crop";
 const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
@@ -250,7 +265,7 @@ export default function ObservationForm() {
           <b className="text-[20px] leading-none sm:text-[21px] text-[#365a1a]">Agrigrowth Monitor</b>
         </Link>
 
-        <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex text-[#365a1a]">
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-10 text-[21px] font-bold lg:flex text-[#365a1a]">
           <Link href="/dashboard" className="hover:opacity-80 transition">
             Home
           </Link>
@@ -275,12 +290,19 @@ export default function ObservationForm() {
         </div>
       </header>
 
-      {/* Form Content */}
-      <section className="mx-auto w-full max-w-[600px] px-5 pb-12 sm:px-10">
-        <div className="rounded-[30px] bg-white p-6 sm:p-8 shadow-lg">
+      {/* Content */}
+      <motion.section 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="mx-auto w-full max-w-[800px] px-4 sm:px-6 pb-12 pt-6 sm:pt-10"
+      >
+        <motion.div variants={fadeUpVariant} className="mb-6 sm:mb-8 text-center">
           <h1 className="text-xl sm:text-2xl md:text-[32px] font-extrabold text-[#365a1a] mb-2">Input Data Pengamatan</h1>
           <p className="text-xs sm:text-sm md:text-base text-[#365a1a]/70 mb-6 sm:mb-8">Masukkan data pertumbuhan tanaman Anda</p>
+        </motion.div>
 
+        <motion.div variants={fadeUpVariant} className="rounded-[24px] sm:rounded-[30px] border-2 border-[#365a1a] bg-white p-5 sm:p-8 md:p-10 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.1),-6px_6px_15px_0px_rgba(0,0,0,0.1)]">
           {trackers.length === 0 ? (
             <div className="rounded-lg bg-yellow-50 border-2 border-yellow-200 p-6 text-center">
               <p className="text-yellow-800 font-semibold mb-2">Belum ada tracker</p>
@@ -296,197 +318,192 @@ export default function ObservationForm() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Tracker Select */}
-            <div>
-              <label className="block text-sm font-bold text-[#365a1a] mb-2">
-                Pilih Tracker *
-              </label>
-              <select
-                name="trackerSelect"
-                value={formData.trackerSelect}
-                onChange={handleChange}
-                className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
-              >
-                <option value="">-- Pilih Tracker --</option>
-                {trackers.map((tracker) => (
-                  <option key={tracker.id} value={tracker.id}>
-                    {tracker.title} ({tracker.plant_type})
-                  </option>
-                ))}
-              </select>
-              {trackers.length === 0 && (
-                <p className="mt-2 text-sm text-red-500">
-                  Belum ada tracker. <Link href="/dashboard" className="font-bold underline">Buat tracker di dashboard</Link>
-                </p>
-              )}
-            </div>
+              {/* Tracker Select */}
+              <div>
+                <label className="block text-sm font-bold text-[#365a1a] mb-2">
+                  Pilih Tracker *
+                </label>
+                <select
+                  name="trackerSelect"
+                  value={formData.trackerSelect}
+                  onChange={handleChange}
+                  className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
+                >
+                  <option value="">-- Pilih Tracker --</option>
+                  {trackers.map((tracker) => (
+                    <option key={tracker.id} value={tracker.id}>
+                      {tracker.title} ({tracker.plant_type})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Day Number */}
-            <div>
-              <label className="block text-sm font-bold text-[#365a1a] mb-2">
-                Hari ke- *
-              </label>
-              <input
-                type="number"
-                name="dayNumber"
-                value={formData.dayNumber}
-                onChange={handleChange}
-                placeholder="Contoh: 1, 2, 3..."
-                min="1"
-                className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
-              />
-            </div>
+              {/* Day Number */}
+              <div>
+                <label className="block text-sm font-bold text-[#365a1a] mb-2">
+                  Hari ke- *
+                </label>
+                <input
+                  type="number"
+                  name="dayNumber"
+                  value={formData.dayNumber}
+                  onChange={handleChange}
+                  placeholder="Contoh: 1, 2, 3..."
+                  min="1"
+                  className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
+                />
+              </div>
 
-            {/* Plant Height */}
-            <div>
-              <label className="block text-sm font-bold text-[#365a1a] mb-2">
-                Tinggi Tanaman (cm) *
-              </label>
-              <input
-                type="number"
-                name="plantHeight"
-                value={formData.plantHeight}
-                onChange={handleChange}
-                placeholder="Contoh: 10.5"
-                step="0.1"
-                min="0"
-                className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
-              />
-            </div>
+              {/* Plant Height */}
+              <div>
+                <label className="block text-sm font-bold text-[#365a1a] mb-2">
+                  Tinggi Tanaman (cm) *
+                </label>
+                <input
+                  type="number"
+                  name="plantHeight"
+                  value={formData.plantHeight}
+                  onChange={handleChange}
+                  placeholder="Contoh: 10.5"
+                  step="0.1"
+                  min="0"
+                  className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
+                />
+              </div>
 
-            {/* Leaf Count */}
-            <div>
-              <label className="block text-sm font-bold text-[#365a1a] mb-2">
-                Jumlah Daun *
-              </label>
-              <input
-                type="number"
-                name="leafCount"
-                value={formData.leafCount}
-                onChange={handleChange}
-                placeholder="Contoh: 5"
-                min="0"
-                className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
-              />
-            </div>
+              {/* Leaf Count */}
+              <div>
+                <label className="block text-sm font-bold text-[#365a1a] mb-2">
+                  Jumlah Daun *
+                </label>
+                <input
+                  type="number"
+                  name="leafCount"
+                  value={formData.leafCount}
+                  onChange={handleChange}
+                  placeholder="Contoh: 5"
+                  min="0"
+                  className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
+                />
+              </div>
 
-            {/* Branch Count */}
-            <div>
-              <label className="block text-sm font-bold text-[#365a1a] mb-2">
-                Jumlah Cabang
-              </label>
-              <input
-                type="number"
-                name="branchCount"
-                value={formData.branchCount}
-                onChange={handleChange}
-                placeholder="Contoh: 2"
-                min="0"
-                className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
-              />
-            </div>
+              {/* Branch Count */}
+              <div>
+                <label className="block text-sm font-bold text-[#365a1a] mb-2">
+                  Jumlah Cabang
+                </label>
+                <input
+                  type="number"
+                  name="branchCount"
+                  value={formData.branchCount}
+                  onChange={handleChange}
+                  placeholder="Contoh: 2"
+                  min="0"
+                  className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
+                />
+              </div>
 
-            {/* Soil PH */}
-            <div>
-              <label className="block text-sm font-bold text-[#365a1a] mb-2">
-                pH Tanah *
-              </label>
-              <input
-                type="number"
-                name="soilPh"
-                value={formData.soilPh}
-                onChange={handleChange}
-                placeholder="Contoh: 6.5"
-                step="0.1"
-                min="0"
-                max="14"
-                className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
-              />
-            </div>
+              {/* Soil PH */}
+              <div>
+                <label className="block text-sm font-bold text-[#365a1a] mb-2">
+                  pH Tanah *
+                </label>
+                <input
+                  type="number"
+                  name="soilPh"
+                  value={formData.soilPh}
+                  onChange={handleChange}
+                  placeholder="Contoh: 6.5"
+                  step="0.1"
+                  min="0"
+                  max="14"
+                  className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
+                />
+              </div>
 
-            {/* Light Condition */}
-            <div>
-              <label className="block text-sm font-bold text-[#365a1a] mb-2">
-                Kondisi Cahaya *
-              </label>
-              <input
-                type="text"
-                name="lightCondition"
-                value={formData.lightCondition}
-                onChange={handleChange}
-                placeholder="Contoh: Cukup"
-                className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
-              />
-            </div>
+              {/* Light Condition */}
+              <div>
+                <label className="block text-sm font-bold text-[#365a1a] mb-2">
+                  Kondisi Cahaya *
+                </label>
+                <input
+                  type="text"
+                  name="lightCondition"
+                  value={formData.lightCondition}
+                  onChange={handleChange}
+                  placeholder="Contoh: Cukup"
+                  className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
+                />
+              </div>
 
-            {/* Plant Condition */}
-            <div>
-              <label className="block text-sm font-bold text-[#365a1a] mb-2">
-                Kondisi Tanaman *
-              </label>
-              <input
-                type="text"
-                name="plantCondition"
-                value={formData.plantCondition}
-                onChange={handleChange}
-                placeholder="Contoh: Sehat"
-                className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
-              />
-            </div>
+              {/* Plant Condition */}
+              <div>
+                <label className="block text-sm font-bold text-[#365a1a] mb-2">
+                  Kondisi Tanaman *
+                </label>
+                <input
+                  type="text"
+                  name="plantCondition"
+                  value={formData.plantCondition}
+                  onChange={handleChange}
+                  placeholder="Contoh: Sehat"
+                  className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
+                />
+              </div>
 
-            {/* Fertilizer Type */}
-            <div>
-              <label className="block text-sm font-bold text-[#365a1a] mb-2">
-                Jenis Pupuk *
-              </label>
-              <input
-                type="text"
-                name="fertilizerType"
-                value={formData.fertilizerType}
-                onChange={handleChange}
-                placeholder="Contoh: NPK"
-                className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
-              />
-            </div>
+              {/* Fertilizer Type */}
+              <div>
+                <label className="block text-sm font-bold text-[#365a1a] mb-2">
+                  Jenis Pupuk *
+                </label>
+                <input
+                  type="text"
+                  name="fertilizerType"
+                  value={formData.fertilizerType}
+                  onChange={handleChange}
+                  placeholder="Contoh: NPK"
+                  className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
+                />
+              </div>
 
-            {/* Land Area */}
-            <div>
-              <label className="block text-sm font-bold text-[#365a1a] mb-2">
-                Luas Lahan *
-              </label>
-              <input
-                type="number"
-                name="landArea"
-                value={formData.landArea}
-                onChange={handleChange}
-                placeholder="Contoh: 1"
-                step="0.1"
-                min="0.1"
-                className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
-              />
-            </div>
+              {/* Land Area */}
+              <div>
+                <label className="block text-sm font-bold text-[#365a1a] mb-2">
+                  Luas Lahan *
+                </label>
+                <input
+                  type="number"
+                  name="landArea"
+                  value={formData.landArea}
+                  onChange={handleChange}
+                  placeholder="Contoh: 1"
+                  step="0.1"
+                  min="0.1"
+                  className="w-full rounded-lg border-2 border-[#365a1a] px-4 py-3 text-[#365a1a] placeholder:text-gray-400 font-medium focus:outline-none focus:ring-2 focus:ring-[#365a1a] focus:ring-offset-2"
+                />
+              </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
-              <button
-                type="button"
-                onClick={() => router.back()}
-                className="flex-1 rounded-lg border-2 border-[#365a1a] bg-white px-6 py-3 text-[#365a1a] font-bold hover:bg-gray-50 transition"
-              >
-                Batal
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="flex-1 rounded-lg bg-[#365a1a] px-6 py-3 text-white font-bold hover:bg-[#2d4915] transition disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {submitting ? "Menyimpan..." : "Simpan Data"}
-              </button>
-            </div>
-          </form>
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => router.back()}
+                  className="flex-1 rounded-lg border-2 border-[#365a1a] bg-white px-6 py-3 text-[#365a1a] font-bold hover:bg-gray-50 transition"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 rounded-lg bg-[#365a1a] px-6 py-3 text-white font-bold hover:bg-[#2d4915] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitting ? "Menyimpan..." : "Simpan Data"}
+                </button>
+              </div>
+            </form>
           )}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
     </main>
   );
 }

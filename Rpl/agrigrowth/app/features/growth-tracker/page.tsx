@@ -3,6 +3,21 @@
 import Link from "next/link";
 import { useUser } from "@/hooks/useUser";
 import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
+import { ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15 }
+  }
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 30 },
+  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 70, damping: 15 } }
+};
 
 const imgGrowthTrackerImage = "https://images.unsplash.com/photo-1592982537447-6f2a6a0c5c8e?q=80&w=800&auto=format&fit=crop";
 const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
@@ -21,7 +36,7 @@ export default function GrowthTracker() {
           <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
         </Link>
 
-        <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-10 text-[21px] font-bold lg:flex">
           <Link href="/dashboard" className="hover:opacity-80 transition">
             Home
           </Link>
@@ -62,9 +77,14 @@ export default function GrowthTracker() {
       </header>
 
       {/* Content */}
-      <section className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 sm:gap-8 px-4 sm:px-5 pb-10 sm:pb-12 pt-4 sm:pt-6 md:px-10 lg:px-14 lg:pt-8">
+      <motion.section 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="mx-auto flex w-full max-w-[1440px] flex-col gap-6 sm:gap-8 px-4 sm:px-5 pb-10 sm:pb-12 pt-4 sm:pt-6 md:px-10 lg:px-14 lg:pt-8"
+      >
         {/* Hero Section */}
-        <article className="rounded-[20px] sm:rounded-[30px] bg-white p-4 sm:p-5 md:p-6 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)]">
+        <motion.article variants={fadeUpVariant} className="rounded-[20px] sm:rounded-[30px] bg-white p-4 sm:p-5 md:p-6 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)]">
           <div className="flex flex-col gap-4 sm:gap-5 md:flex-row md:items-center md:gap-8">
             <div className="h-[150px] sm:h-[190px] w-full overflow-hidden rounded-[16px] sm:rounded-[20px] md:h-[273px] md:max-w-[605px]">
               <img alt="Growth Tracker" className="h-full w-full object-cover" src={imgGrowthTrackerImage} />
@@ -79,10 +99,10 @@ export default function GrowthTracker() {
               </p>
             </div>
           </div>
-        </article>
+        </motion.article>
 
         {/* Features List */}
-        <div className="rounded-[20px] sm:rounded-[30px] bg-white p-4 sm:p-6 md:p-8 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)]">
+        <motion.div variants={fadeUpVariant} className="rounded-[20px] sm:rounded-[30px] bg-white p-4 sm:p-6 md:p-8 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)]">
           <h2 className="text-[24px] sm:text-[32px] font-bold md:text-[40px]">Fitur Growth Tracker</h2>
 
           <div className="mt-4 sm:mt-6 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2">
@@ -125,10 +145,10 @@ export default function GrowthTracker() {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
         {/* CTA Section */}
-        <div className="rounded-[20px] sm:rounded-[30px] bg-[#365a1a] p-4 sm:p-6 md:p-8 text-center text-white">
+        <motion.div variants={fadeUpVariant} className="rounded-[20px] sm:rounded-[30px] bg-[#365a1a] p-4 sm:p-6 md:p-8 text-center text-white">
           <h2 className="text-[20px] sm:text-[28px] font-bold md:text-[36px]">Mulai Tracking Tanaman Anda</h2>
           <p className="mt-2 sm:mt-3 text-[14px] sm:text-[16px] md:text-[18px]">
             Catat data tanaman Anda secara berkala dan dapatkan insight yang akurat
@@ -139,7 +159,7 @@ export default function GrowthTracker() {
           >
             Buka Dashboard
           </Link>
-        </div>
+        </motion.div>
 
         {/* Back Button */}
         <Link
@@ -148,7 +168,7 @@ export default function GrowthTracker() {
         >
           ← Kembali ke Features
         </Link>
-      </section>
+      </motion.section>
     </main>
   );
 }

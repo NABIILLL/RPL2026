@@ -24,6 +24,26 @@ import { useUser } from "@/hooks/useUser";
 import AuthModal from "@/components/AuthModal";
 import ProfileEditor from "@/components/ProfileEditor";
 import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
+import { motion } from "framer-motion";
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 30 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: "spring", stiffness: 70, damping: 15 }
+  }
+};
 
 const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
 const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
@@ -117,7 +137,7 @@ export default function ProfilePage() {
           <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
         </div>
 
-        <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-10 text-[21px] font-bold lg:flex">
           <Link href={user ? "/dashboard" : "/"} className="transition hover:opacity-80">
             Home
           </Link>
@@ -157,10 +177,15 @@ export default function ProfilePage() {
         )}
       </header>
 
-      <section className="mx-auto w-full max-w-[1440px] px-5 pb-16 sm:px-10 lg:px-14">
+      <motion.section 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="mx-auto w-full max-w-[1440px] px-5 pb-16 sm:px-10 lg:px-14"
+      >
         <h1 className="sr-only">Halaman profil pengguna AgriGrowth Monitor</h1>
 
-        <div className="relative overflow-hidden rounded-[24px] bg-[#1f4b1a] text-white shadow-[0_24px_60px_rgba(23,52,4,0.25)]">
+        <motion.div variants={fadeUpVariant} className="relative overflow-hidden rounded-[24px] bg-[#1f4b1a] text-white shadow-[0_24px_60px_rgba(23,52,4,0.25)]">
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(120deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0)_42%),repeating-linear-gradient(45deg,rgba(255,255,255,0.04)_0,rgba(255,255,255,0.04)_1px,transparent_1px,transparent_14px)]" />
           <div className="relative flex flex-col gap-6 px-6 pb-6 pt-8 sm:px-10 lg:flex-row lg:items-start lg:gap-10">
             <div className="flex items-start gap-5">
@@ -214,10 +239,10 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-[18px] border border-[#e0e5da] bg-white p-6 shadow-[0_14px_30px_rgba(54,90,26,0.08)]">
+          <motion.div variants={fadeUpVariant} className="rounded-[18px] border border-[#e0e5da] bg-white p-6 shadow-[0_14px_30px_rgba(54,90,26,0.08)]">
             <div className="flex items-center gap-3 text-[#365a1a]">
               <InfoBadge icon={Mail} label="Informasi" />
             </div>
@@ -227,9 +252,9 @@ export default function ProfilePage() {
               <InfoRow icon={MapPin} label="Lokasi" value={displayLocation} />
               <InfoRow icon={CalendarDays} label="Bergabung" value={defaultProfile.joined} />
             </div>
-          </div>
+          </motion.div>
 
-          <div className="rounded-[18px] border border-[#e0e5da] bg-white p-6 shadow-[0_14px_30px_rgba(54,90,26,0.08)]">
+          <motion.div variants={fadeUpVariant} className="rounded-[18px] border border-[#e0e5da] bg-white p-6 shadow-[0_14px_30px_rgba(54,90,26,0.08)]">
             <div className="flex items-center gap-3 text-[#365a1a]">
               <InfoBadge icon={BarChart3} label="Keahlian" />
             </div>
@@ -251,11 +276,11 @@ export default function ProfilePage() {
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
-          <div className="rounded-[18px] border border-[#e0e5da] bg-white p-6 shadow-[0_14px_30px_rgba(54,90,26,0.08)]">
+          <motion.div variants={fadeUpVariant} className="rounded-[18px] border border-[#e0e5da] bg-white p-6 shadow-[0_14px_30px_rgba(54,90,26,0.08)]">
             <div className="flex items-center gap-3 text-[#365a1a]">
               <InfoBadge icon={Sprout} label="Lahan Saya" />
             </div>
@@ -293,9 +318,9 @@ export default function ProfilePage() {
                 </div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
-          <div className="rounded-[18px] border border-[#e0e5da] bg-white p-6 shadow-[0_14px_30px_rgba(54,90,26,0.08)]">
+          <motion.div variants={fadeUpVariant} className="rounded-[18px] border border-[#e0e5da] bg-white p-6 shadow-[0_14px_30px_rgba(54,90,26,0.08)]">
             <div className="flex items-center gap-3 text-[#365a1a]">
               <InfoBadge icon={CloudSun} label="Cuaca Hari Ini" />
             </div>
@@ -308,10 +333,10 @@ export default function ProfilePage() {
               <WeatherCard icon={Wind} label="Angin" value="12km/j" />
               <WeatherCard icon={Sun} label="Curah Hujan" value="4.2mm" />
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        <div className="mt-6 rounded-[18px] border border-[#e0e5da] bg-white p-6 shadow-[0_14px_30px_rgba(54,90,26,0.08)]">
+        <motion.div variants={fadeUpVariant} className="mt-6 rounded-[18px] border border-[#e0e5da] bg-white p-6 shadow-[0_14px_30px_rgba(54,90,26,0.08)]">
           <div className="flex items-center gap-3 text-[#365a1a]">
             <InfoBadge icon={History} label="Aktivitas Terbaru" />
           </div>
@@ -338,9 +363,9 @@ export default function ProfilePage() {
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
 
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <motion.div variants={fadeUpVariant} className="mt-6 flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
             className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-[#365a1a] px-5 py-3 text-[14px] font-semibold text-white transition hover:bg-[#2d4915]"
@@ -355,8 +380,8 @@ export default function ProfilePage() {
             <History className="h-4 w-4" aria-hidden="true" />
             Lihat Laporan
           </button>
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
     </main>
   );
 }

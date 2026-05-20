@@ -18,6 +18,26 @@ import {
 } from "recharts";
 import { jsPDF } from "jspdf";
 import * as htmlToImage from "html-to-image";
+import { motion } from "framer-motion";
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 30 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: "spring", stiffness: 70, damping: 15 }
+  }
+};
 
 const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
 const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
@@ -477,7 +497,7 @@ export default function ObservationHistory() {
           <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
         </Link>
 
-        <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-10 text-[21px] font-bold lg:flex">
           <Link href={user ? "/dashboard" : "/"} className="transition hover:opacity-80">
             Home
           </Link>
@@ -506,8 +526,13 @@ export default function ObservationHistory() {
       </header>
 
       {/* Content */}
-      <section className="mx-auto w-full max-w-[1440px] px-3 sm:px-5 pb-10 sm:pb-12 md:px-10 lg:px-14">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mt-2 sm:mt-4">
+      <motion.section 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="mx-auto w-full max-w-[1440px] px-3 sm:px-5 pb-10 sm:pb-12 md:px-10 lg:px-14"
+      >
+        <motion.div variants={fadeUpVariant} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 mt-2 sm:mt-4">
           <h1 className="text-lg sm:text-2xl md:text-4xl lg:text-[58px] font-extrabold leading-[1.08] text-[#365a1a]">
             Monitoring Grafik {trackerTitle}
           </h1>
@@ -529,16 +554,16 @@ export default function ObservationHistory() {
               📤
             </button>
           </div>
-        </div>
+        </motion.div>
 
         <div id="pdf-content" className="mt-6 sm:mt-10 p-2 sm:p-4 bg-[#f4f4f4]">
           {loading ? (
-            <div className="flex flex-col items-center justify-center rounded-[20px] bg-white py-12 sm:py-16 px-4 sm:px-6 text-center shadow-sm border border-gray-100">
+            <motion.div variants={fadeUpVariant} className="flex flex-col items-center justify-center rounded-[20px] bg-white py-12 sm:py-16 px-4 sm:px-6 text-center shadow-sm border border-gray-100">
               <div className="h-8 sm:h-10 w-8 sm:w-10 animate-spin rounded-full border-4 border-[#365a1a] border-t-transparent"></div>
               <p className="mt-3 sm:mt-4 text-sm sm:text-base text-[#365a1a] font-medium">Memuat data lahan...</p>
-            </div>
+            </motion.div>
           ) : trackers.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-[30px] border-2 border-dashed border-[#9fb08d] bg-white py-16 sm:py-24 px-4 sm:px-6 text-center">
+            <motion.div variants={fadeUpVariant} className="flex flex-col items-center justify-center rounded-[30px] border-2 border-dashed border-[#9fb08d] bg-white py-16 sm:py-24 px-4 sm:px-6 text-center">
               <div className="flex h-16 sm:h-20 w-16 sm:w-20 items-center justify-center rounded-full bg-[#f0f4eb] mb-4 sm:mb-6">
                 <span className="text-3xl sm:text-5xl">🚜</span>
               </div>
@@ -552,9 +577,9 @@ export default function ObservationHistory() {
               >
                 Buat Tracker Lahan
               </Link>
-            </div>
+            </motion.div>
           ) : !selectedTrackerId ? (
-            <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-4 sm:p-8 shadow-sm">
+            <motion.div variants={fadeUpVariant} className="rounded-[20px] border-2 border-[#365a1a] bg-white p-4 sm:p-8 shadow-sm">
               <h2 className="mb-4 sm:mb-6 text-[20px] font-bold sm:text-[28px]">🌾 Pilih Lahan yang Ingin Dimonitor</h2>
               <p className="text-[13px] sm:text-base text-[#365a1a]/70 mb-4 sm:mb-6">Anda memiliki {trackers.length} lahan yang telah dicatat untuk {trackerTitle}:</p>
               <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
@@ -575,10 +600,10 @@ export default function ObservationHistory() {
                   </button>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ) : chartData.length > 0 ? (
             <div className="space-y-6 sm:space-y-8">
-              <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between rounded-[16px] bg-[#f0f4eb] p-3 sm:p-4 border-l-4 border-[#365a1a] gap-3 sm:gap-4">
+              <motion.div variants={fadeUpVariant} className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between rounded-[16px] bg-[#f0f4eb] p-3 sm:p-4 border-l-4 border-[#365a1a] gap-3 sm:gap-4">
                 <div>
                   <p className="text-[11px] sm:text-sm text-[#365a1a]/70">Lahan yang dipilih:</p>
                   <p className="text-[16px] sm:text-[20px] font-bold text-[#365a1a]">{trackers.find(t => t.id === selectedTrackerId)?.title}</p>
@@ -589,10 +614,10 @@ export default function ObservationHistory() {
                 >
                   ← Kembali ke Daftar
                 </button>
-              </div>
+              </motion.div>
 
               {/* Tabs */}
-              <div className="flex gap-3 sm:gap-4 border-b-2 border-gray-200 overflow-x-auto">
+              <motion.div variants={fadeUpVariant} className="flex gap-3 sm:gap-4 border-b-2 border-gray-200 overflow-x-auto">
                 <button
                   onClick={() => setActiveTab("pengamatan")}
                   className={`pb-2 text-[14px] sm:text-[18px] font-bold transition-all whitespace-nowrap ${
@@ -613,12 +638,12 @@ export default function ObservationHistory() {
                 >
                   💰 Pengelolaan Biaya
                 </button>
-              </div>
+              </motion.div>
               
               {activeTab === "pengamatan" && (
                 <>
               {/* Grafik Tinggi Tanaman */}
-              <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-3 sm:p-4 md:p-6 shadow-sm overflow-hidden">
+              <motion.div variants={fadeUpVariant} className="rounded-[20px] border-2 border-[#365a1a] bg-white p-3 sm:p-4 md:p-6 shadow-sm overflow-hidden">
                 <h2 className="mb-3 sm:mb-4 md:mb-6 text-[18px] sm:text-[20px] font-bold md:text-[24px]">📊 GRAFIK TINGGI TANAMAN</h2>
                 <div className="h-[200px] sm:h-[250px] md:h-[300px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -638,10 +663,10 @@ export default function ObservationHistory() {
                   <p className="text-[13px] sm:text-[16px] font-semibold text-[#365a1a]">Tren: {stats.avgHeightGrowth >= 0 ? '↑ Meningkat' : '↓ Menurun'} ({stats.avgHeightGrowth.toFixed(2)} cm/hari)</p>
                   <p className="text-[12px] sm:text-[14px] text-gray-600">Total tinggi terakhir: {stats.endHeight} cm</p>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Grafik Jumlah Daun */}
-              <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-3 sm:p-4 md:p-6 shadow-sm overflow-hidden">
+              <motion.div variants={fadeUpVariant} className="rounded-[20px] border-2 border-[#365a1a] bg-white p-3 sm:p-4 md:p-6 shadow-sm overflow-hidden">
                 <h2 className="mb-3 sm:mb-4 md:mb-6 text-[18px] sm:text-[20px] font-bold md:text-[24px]">📊 GRAFIK JUMLAH DAUN</h2>
                 <div className="h-[200px] sm:h-[250px] md:h-[300px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
@@ -661,10 +686,10 @@ export default function ObservationHistory() {
                   <p className="text-[13px] sm:text-[16px] font-semibold text-[#365a1a]">Tren: {stats.avgLeafGrowth >= 0 ? '↑ Bertambah' : '↓ Berkurang'} ({stats.avgLeafGrowth.toFixed(2)} daun/hari)</p>
                   <p className="text-[12px] sm:text-[14px] text-gray-600">Total daun terakhir: {stats.endLeaf} helai</p>
                 </div>
-              </div>
+              </motion.div>
 
               {/* Analisis Pertumbuhan */}
-              <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-3 sm:p-4 md:p-6 shadow-sm">
+              <motion.div variants={fadeUpVariant} className="rounded-[20px] border-2 border-[#365a1a] bg-white p-3 sm:p-4 md:p-6 shadow-sm">
                 <h2 className="mb-4 sm:mb-6 text-[18px] sm:text-[20px] font-bold md:text-[24px] uppercase">Analisis Pertumbuhan</h2>
                 <div className="grid gap-6 sm:gap-8 grid-cols-1 sm:grid-cols-2">
                   <div>
@@ -693,10 +718,10 @@ export default function ObservationHistory() {
                     <p className="flex items-center gap-2"><span>✓</span> Tidak ada penurunan ekstrim yang tercatat.</p>
                   </div>
                 </div>
-              </div>
+              </motion.div>
 
                 {/* Prediksi Panen & Rekomendasi Pupuk */}
-                <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-6 shadow-sm">
+                <motion.div variants={fadeUpVariant} className="rounded-[20px] border-2 border-[#365a1a] bg-white p-6 shadow-sm">
                   <h2 className="mb-4 text-[20px] font-bold sm:text-[24px]">🔮 Prediksi Panen & Rekomendasi Pupuk</h2>
                   <PredictionsSection
                     plantType={id}
@@ -704,10 +729,10 @@ export default function ObservationHistory() {
                     currentHeight={stats.endHeight}
                     latestLog={logsRaw.length ? logsRaw[logsRaw.length - 1] : null}
                   />
-                </div>
+                </motion.div>
 
                 {/* Logs list with edit/delete */}
-                <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-6 shadow-sm">
+                <motion.div variants={fadeUpVariant} className="rounded-[20px] border-2 border-[#365a1a] bg-white p-6 shadow-sm">
                   <h2 className="mb-4 text-[20px] font-bold sm:text-[24px]">📝 Daftar Pengamatan (Edit / Hapus)</h2>
                   <div className="space-y-3">
                     {logsRaw.map((log) => (
@@ -723,7 +748,7 @@ export default function ObservationHistory() {
                       </div>
                     ))}
                   </div>
-                </div>
+                </motion.div>
 
                 </>
               )}
@@ -955,7 +980,7 @@ export default function ObservationHistory() {
         >
           ← Kembali ke Dashboard
         </Link>
-      </section>
+      </motion.section>
     </main>
   );
 }
