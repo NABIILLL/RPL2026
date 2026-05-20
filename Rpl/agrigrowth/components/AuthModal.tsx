@@ -242,9 +242,9 @@ export default function AuthModal({ isOpen, onClose, initialMode, initialStep }:
       </button>
 
       {/* Modal card */}
-      <div className="relative w-full max-w-[525px] max-h-[90vh] overflow-y-auto rounded-[25px] bg-white px-[42px] py-[40px] md:py-[60px] pb-[38px] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="relative w-full max-w-[525px] max-h-[90vh] overflow-y-auto rounded-[25px] bg-white px-6 py-6 sm:px-[42px] sm:py-[40px] md:py-[60px] pb-[38px] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {/* Logo */}
-        <div className="mb-[50px] flex justify-center">
+        <div className="mb-12 flex justify-center">
           <img alt="Logo" className="h-[51px] w-[59px]" src={imgGroup2} />
         </div>
 

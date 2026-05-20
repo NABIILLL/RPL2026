@@ -172,10 +172,10 @@ export default function ProfilePage() {
                   <Leaf className="h-3.5 w-3.5" aria-hidden="true" />
                   {displayRole || defaultProfile.role}
                 </span>
-                <h2 className="mt-3 text-[28px] font-semibold leading-tight sm:text-[32px]">
+                <h2 className="mt-3 text-xl sm:text-2xl md:text-[32px] font-semibold leading-tight">
                   {displayName}
                 </h2>
-                <p className="mt-1 text-[13px] text-[#d8edae] sm:text-[14px]">
+                <p className="mt-1 text-xs sm:text-[13px] md:text-[14px] text-[#d8edae]">
                   {user?.bio || defaultProfile.subtitle} · {displayLocation}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -199,14 +199,14 @@ export default function ProfilePage() {
                 <Edit2 className="h-4 w-4" aria-hidden="true" />
                 Edit Profil
               </button>
-              <div className="grid grid-cols-2 gap-4 text-center text-white sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 text-center text-white sm:grid-cols-4">
                 {stats.map((stat) => (
                   <div
                     key={stat.label}
-                    className="rounded-2xl border border-white/10 bg-white/5 px-3 py-4"
+                    className="rounded-2xl border border-white/10 bg-white/5 px-2 sm:px-3 py-3 sm:py-4"
                   >
-                    <div className="text-[22px] font-semibold sm:text-[24px]">{stat.value}</div>
-                    <div className="mt-1 text-[10px] uppercase tracking-[0.2em] text-[#d8edae]">
+                    <div className="text-lg sm:text-2xl md:text-[24px] font-semibold">{stat.value}</div>
+                    <div className="mt-1 text-[9px] sm:text-[10px] uppercase tracking-[0.15em] sm:tracking-[0.2em] text-[#d8edae]">
                       {stat.label}
                     </div>
                   </div>
@@ -235,8 +235,8 @@ export default function ProfilePage() {
             </div>
             <div className="mt-5 space-y-4">
               {skills.map((skill) => (
-                <div key={skill.label} className="flex items-center gap-4">
-                  <div className="min-w-[120px] text-[13px] text-[#6a7f55]">
+                <div key={skill.label} className="flex items-center gap-2 sm:gap-4">
+                  <div className="min-w-[80px] sm:min-w-[120px] text-xs sm:text-[13px] text-[#6a7f55]">
                     {skill.label}
                   </div>
                   <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#ecf1e6]">

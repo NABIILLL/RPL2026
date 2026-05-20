@@ -380,7 +380,7 @@ export default function Dashboard() {
                 <p className="max-h-0 overflow-hidden bg-white px-4 text-[12px] text-[#365a1a]/80 opacity-0 transition-all duration-200 group-focus-within:max-h-16 group-focus-within:py-2 group-focus-within:opacity-100">
                   Isi nomor hari pengamatan. Tipe data: bilangan bulat (contoh: 1, 2, 3).
                 </p>
-                <div className="grid grid-cols-[1fr_170px] gap-px bg-[#365a1a]">
+                <div className="grid grid-cols-1 sm:grid-cols-[1fr_170px] gap-px bg-[#365a1a]">
                   <input
                     type="text"
                     placeholder="Keterangan (contoh: Hari ke-)"

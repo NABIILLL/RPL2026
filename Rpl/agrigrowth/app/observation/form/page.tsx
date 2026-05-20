@@ -277,9 +277,9 @@ export default function ObservationForm() {
 
       {/* Form Content */}
       <section className="mx-auto w-full max-w-[600px] px-5 pb-12 sm:px-10">
-        <div className="rounded-[30px] bg-white p-8 shadow-lg">
-          <h1 className="text-[32px] font-extrabold text-[#365a1a] mb-2">Input Data Pengamatan</h1>
-          <p className="text-[#365a1a]/70 mb-8">Masukkan data pertumbuhan tanaman Anda</p>
+        <div className="rounded-[30px] bg-white p-6 sm:p-8 shadow-lg">
+          <h1 className="text-xl sm:text-2xl md:text-[32px] font-extrabold text-[#365a1a] mb-2">Input Data Pengamatan</h1>
+          <p className="text-xs sm:text-sm md:text-base text-[#365a1a]/70 mb-6 sm:mb-8">Masukkan data pertumbuhan tanaman Anda</p>
 
           {trackers.length === 0 ? (
             <div className="rounded-lg bg-yellow-50 border-2 border-yellow-200 p-6 text-center">

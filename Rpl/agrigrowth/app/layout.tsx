@@ -21,6 +21,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Agrigrowth Monitor",
   description: "Agricultural growth tracker wireframes and dashboard views.",
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({

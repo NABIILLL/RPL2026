@@ -279,3 +279,28 @@
   .admin-app .admin-profile-hero{align-items:flex-start;flex-direction:column}
   .admin-app .admin-profile-main h1{font-size:26px}
 }
+
+@media (max-width: 640px){
+  .admin-app{--sidebar-w:0;font-size:13px}
+  .admin-app .kpi-grid{grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+  .admin-app .kpi-card{padding:12px}
+  .admin-app .kpi-num{font-size:22px}
+  .admin-app .kpi-label{font-size:10px}
+  .admin-app .page-title{font-size:18px}
+  .admin-app .btn{padding:5px 10px;font-size:11px}
+  .admin-app .topbar-search input{font-size:11px;padding:4px 8px 4px 28px}
+  .admin-app .media-grid{grid-template-columns:repeat(2,1fr);gap:6px;padding:10px 12px}
+  .admin-app .admin-profile-main h1{font-size:22px}
+  .admin-app .admin-profile-email{font-size:11px}
+  .admin-app .mini-btn{padding:3px 8px;font-size:10px}
+  .admin-app table{font-size:11px}
+  .admin-app th{padding:6px 8px;font-size:9px}
+  .admin-app td{padding:7px 8px;font-size:11px}
+  .admin-app .content{padding:12px}
+  .admin-app .chart-area{padding:12px;height:140px}
+  .admin-app .donut-wrap{flex-direction:column;gap:10px;padding:10px 12px}
+  .admin-app .stat-inline{flex-direction:column;gap:0}
+  .admin-app .stat-cell{padding:8px 12px;border-right:none;border-bottom:1px solid var(--border)}
+  .admin-app .stat-cell:last-child{border-bottom:none}
+  .admin-app .stat-cell-num{font-size:16px}
+}

@@ -41,9 +41,9 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
       </button>
 
       {/* Modal card */}
-      <div className="relative w-full max-w-[525px] rounded-[25px] bg-white px-[42px] py-[37px] pb-[38px]">
+      <div className="relative w-full max-w-[525px] rounded-[25px] bg-white px-6 py-6 pb-10 sm:px-[42px] sm:py-[37px]">
         {/* Logo */}
-        <div className="mb-[116px] flex justify-center">
+        <div className="mb-24 flex justify-center">
           <img alt="Logo" className="h-[51px] w-[59px]" src={imgGroup2} />
         </div>
 
@@ -56,14 +56,14 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleNext} className="mb-[116px] space-y-[18px]">
+        <form onSubmit={handleNext} className="mb-24 space-y-4">
           {/* Email input */}
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
-            className="w-full rounded-[15px] border border-black/50 bg-transparent px-[17px] py-[24px] font-['Plus_Jakarta_Sans:Medium'] text-[18px] font-medium text-black placeholder-black/50 focus:outline-none"
+            className="w-full rounded-[15px] border border-black/50 bg-transparent px-4 py-3 sm:px-[17px] sm:py-[24px] font-['Plus_Jakarta_Sans:Medium'] text-[16px] sm:text-[18px] font-medium text-black placeholder-black/50 focus:outline-none"
           />
 
           {/* Password input */}
@@ -72,16 +72,11 @@ export default function SignUpModal({ isOpen, onClose }: SignUpModalProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className="w-full rounded-[15px] border border-black/50 bg-transparent px-[17px] py-[24px] font-['Plus_Jakarta_Sans:Medium'] text-[18px] font-medium text-black placeholder-black/50 focus:outline-none"
+            className="w-full rounded-[15px] border border-black/50 bg-transparent px-4 py-3 sm:px-[17px] sm:py-[24px] font-['Plus_Jakarta_Sans:Medium'] text-[16px] sm:text-[18px] font-medium text-black placeholder-black/50 focus:outline-none"
           />
 
           {/* Next button */}
-          <button
-            type="submit"
-            className="w-full rounded-[42px] bg-black py-[25px] font-['Plus_Jakarta_Sans:Medium'] text-[18px] font-medium text-white transition hover:bg-black/80"
-          >
-            Next
-          </button>
+          <button type="submit" className="w-full rounded-[42px] bg-black py-3 sm:py-[25px] font-['Plus_Jakarta_Sans:Medium'] text-[16px] sm:text-[18px] font-medium text-white transition hover:bg-black/80">Next</button>
         </form>
 
         {/* Footer */}

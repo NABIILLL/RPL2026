@@ -508,25 +508,25 @@ export default function ObservationHistory() {
       {/* Content */}
       <section className="mx-auto w-full max-w-[1440px] px-5 pb-12 sm:px-10 lg:px-14">
         <div className="flex flex-wrap items-center justify-between gap-4 mt-2 sm:mt-4">
-          <h1 className="text-[32px] font-extrabold leading-[1.08] text-[#365a1a] sm:text-[42px] lg:text-[58px]">
+          <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-[58px] font-extrabold leading-[1.08] text-[#365a1a]">
             Monitoring Grafik {trackerTitle}
           </h1>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Link
               href="/observation/form"
-              className="rounded-full bg-[#365a1a] px-6 py-2.5 text-sm font-bold text-white shadow-md hover:bg-[#2d4915] hover:shadow-lg transition"
+              className="rounded-full bg-[#365a1a] px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-md hover:bg-[#2d4915] hover:shadow-lg transition"
             >
-              ➕ Input Data
+              ➕ Input
             </Link>
             <button 
               onClick={handleExportPDF}
               disabled={isExporting || !selectedTrackerId || chartData.length === 0}
-              className="rounded-full bg-white px-6 py-2.5 text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition disabled:opacity-50"
+              className="rounded-full bg-white px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition disabled:opacity-50"
             >
-              {isExporting ? "Memproses..." : "📥 Export PDF"}
+              {isExporting ? "..." : "📥 Export"}
             </button>
-            <button className="rounded-full bg-white px-6 py-2.5 text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition">
-              📤 Share
+            <button className="rounded-full bg-white px-3 sm:px-6 py-2 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md border border-[#365a1a]/20 hover:bg-gray-50 hover:shadow-lg transition">
+              📤
             </button>
           </div>
         </div>
@@ -557,7 +557,7 @@ export default function ObservationHistory() {
             <div className="rounded-[20px] border-2 border-[#365a1a] bg-white p-8 shadow-sm">
               <h2 className="mb-6 text-[24px] font-bold sm:text-[28px]">🌾 Pilih Lahan yang Ingin Dimonitor</h2>
               <p className="text-[#365a1a]/70 mb-6">Anda memiliki {trackers.length} lahan yang telah dicatat untuk {trackerTitle}:</p>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {trackers.map((tracker) => (
                   <button
                     key={tracker.id}

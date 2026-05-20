@@ -102,18 +102,18 @@ export default function Wireframe4() {
 								}
 							}}>
 								<div className="flex flex-col gap-5 md:flex-row md:items-center md:gap-8">
-									<div className="h-[190px] w-full overflow-hidden rounded-[20px] md:h-[273px] md:max-w-[605px] group-hover:opacity-80 transition">
+									<div className="h-32 sm:h-40 md:h-[273px] w-full overflow-hidden rounded-[20px] md:max-w-[605px] group-hover:opacity-80 transition">
 										<img alt={feature.title} loading="lazy" className="h-full w-full object-cover" src={feature.image} />
 									</div>
 
 									<div className="w-full md:max-w-[578px]">
-										<h2 className="text-[42px] font-extrabold leading-[1.05] text-[#365a1a] lg:text-[60px] group-hover:opacity-80 transition">
+											<h2 className="text-xl sm:text-3xl md:text-4xl lg:text-[60px] font-extrabold leading-[1.05] text-[#365a1a] group-hover:opacity-80 transition">
 											{feature.title}
 										</h2>
-										<p className="mt-3 text-[15px] font-medium leading-[1.35] text-[#365a1a] lg:text-[18px]">
+											<p className="mt-3 text-xs sm:text-sm md:text-base lg:text-[18px] font-medium leading-[1.35] text-[#365a1a]">
 											{feature.description}
 										</p>
-										<button className="mt-6 inline-block rounded-full bg-[#365a1a] px-6 py-3 text-[14px] font-semibold text-white transition hover:bg-[#2d4915] group-hover:translate-x-1">
+											<button className="mt-4 sm:mt-6 inline-block rounded-full bg-[#365a1a] px-4 sm:px-6 py-2 sm:py-3 text-xs sm:text-sm md:text-base font-semibold text-white transition hover:bg-[#2d4915] group-hover:translate-x-1">
 											Pelajari Lebih Lanjut →
 										</button>
 									</div>

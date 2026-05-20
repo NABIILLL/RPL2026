@@ -19,13 +19,13 @@ export default function About() {
     <main className="min-h-screen bg-white text-[#365a1a]">
       <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       {/* Header */}
-      <header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-4 px-5 py-6 sm:px-10 lg:px-14">
+      <header className="relative z-50 mx-auto flex w-full max-w-[1440px] items-center justify-between gap-2 sm:gap-4 px-5 py-4 sm:py-6 sm:px-10 lg:px-14">
         <AgrigrowthLogo
           tone="light"
           textClassName="text-[20px] font-bold leading-none text-[#365a1a] sm:text-[21px]"
         />
 
-        <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
+        <nav className="hidden items-center gap-4 sm:gap-6 md:gap-10 text-sm sm:text-base md:text-lg font-bold lg:flex">
           <Link href={user ? "/dashboard" : "/"} className="transition hover:opacity-80">
             Home
           </Link>
@@ -39,20 +39,20 @@ export default function About() {
 
         {!isLoading && (
           user ? (
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 md:gap-4">
               <Link
                 href="/profile"
-                className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-3 py-2 text-[16px] font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90 sm:text-[18px]"
+                className="flex items-center gap-2 rounded-full bg-[rgba(54,90,26,0.75)] px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base font-medium text-[#d7e4cd] shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition hover:opacity-90"
               >
                 <span>{user.name}</span>
                 <img alt="Profile" loading="lazy" className="h-8 w-8 object-contain" src={imgProfile} />
               </Link>
-              <button onClick={handleLogout} disabled={isLoggingOut} className="text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
+              <button onClick={handleLogout} disabled={isLoggingOut} className="text-xs sm:text-sm font-bold text-[#365a1a] hover:opacity-80 transition">
                 {isLoggingOut ? "Keluar..." : "Logout"}
               </button>
             </div>
           ) : (
-            <button onClick={() => setIsModalOpen(true)} className="rounded-full bg-[#365a1a] px-5 py-2 text-[16px] font-medium text-white shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] sm:text-[18px] hover:bg-[#2d4915] transition">
+            <button onClick={() => setIsModalOpen(true)} className="rounded-full bg-[#365a1a] px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm md:text-base font-medium text-white shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] hover:bg-[#2d4915] transition">
               Login / Sign Up
             </button>
           )
@@ -60,15 +60,15 @@ export default function About() {
       </header>
 
       {/* Content */}
-      <section className="mx-auto w-full max-w-[1440px] px-5 py-12 sm:px-10 lg:px-14">
+      <section className="mx-auto w-full px-4 sm:px-5 py-8 sm:py-12 sm:px-10 lg:px-14">
         <div className="mx-auto max-w-[1299px]">
           {/* Title */}
-          <h1 className="text-[48px] font-extrabold leading-[1.2] sm:text-[56px]">
+          <h1 className="text-3xl font-extrabold leading-[1.2] sm:text-4xl md:text-5xl lg:text-[56px]">
             Tentang AgriGrowth Monitor
           </h1>
 
           {/* Description */}
-          <div className="mt-8 space-y-5 text-[18px] leading-[1.6] text-[#365a1a] sm:text-[20px]">
+          <div className="mt-8 space-y-5 text-sm sm:text-base md:text-lg lg:text-[20px] leading-[1.6] text-[#365a1a]">
             <p>
               AgriGrowth Monitor adalah platform digital berbasis web yang dirancang untuk membantu
               mahasiswa pertanian dan petani dalam mencatat, memonitor, dan menganalisis data
@@ -94,34 +94,51 @@ export default function About() {
           </div>
 
           {/* Stats Cards */}
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div 
+            className="mt-12"
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '1rem',
+              justifyContent: 'center'
+            }}
+          >
             {/* Komoditas Card */}
-            <div className="rounded-[20px] border-2 border-[#d9d9d9] bg-white p-6 shadow-[0px_4px_4px_rgba(0,0,0,0.1)]">
-              <p className="text-[13px] font-extrabold uppercase tracking-wide text-[#8e938a]">
+            <div 
+              className="rounded-[20px] border-2 border-[#d9d9d9] bg-white p-4 sm:p-6 shadow-[0px_4px_4px_rgba(0,0,0,0.1)]"
+              style={{ flex: '1 1 calc(100% - 1rem)', minWidth: '250px', maxWidth: '350px' }}
+            >
+              <p className="text-xs sm:text-[13px] font-extrabold uppercase tracking-wide text-[#8e938a]">
                 Komoditas
               </p>
-              <p className="mt-2 text-[40px] font-extrabold text-black">3</p>
-              <p className="mt-2 text-[13px] text-[#365a1a]">
+              <p className="mt-2 text-2xl sm:text-3xl md:text-4xl font-extrabold text-black">3</p>
+              <p className="mt-2 text-xs sm:text-[13px] text-[#365a1a]">
                 Padi · Jagung · Bawang Merah
               </p>
             </div>
 
             {/* Fitur Utama Card */}
-            <div className="rounded-[20px] border-2 border-[#d9d9d9] bg-white p-6 shadow-[0px_4px_4px_rgba(0,0,0,0.1)]">
-              <p className="text-[13px] font-extrabold uppercase tracking-wide text-[#8e938a]">
+            <div 
+              className="rounded-[20px] border-2 border-[#d9d9d9] bg-white p-4 sm:p-6 shadow-[0px_4px_4px_rgba(0,0,0,0.1)]"
+              style={{ flex: '1 1 calc(100% - 1rem)', minWidth: '250px', maxWidth: '350px' }}
+            >
+              <p className="text-xs sm:text-[13px] font-extrabold uppercase tracking-wide text-[#8e938a]">
                 Fitur Utama
               </p>
-              <p className="mt-2 text-[40px] font-extrabold text-black">8+</p>
-              <p className="mt-2 text-[13px] text-[#365a1a]">Terintegrasi penuh</p>
+              <p className="mt-2 text-2xl sm:text-3xl md:text-4xl font-extrabold text-black">8+</p>
+              <p className="mt-2 text-xs sm:text-[13px] text-[#365a1a]">Terintegrasi penuh</p>
             </div>
 
             {/* Platform Card */}
-            <div className="rounded-[20px] border-2 border-[#d9d9d9] bg-white p-6 shadow-[0px_4px_4px_rgba(0,0,0,0.1)]">
-              <p className="text-[13px] font-extrabold uppercase tracking-wide text-[#8e938a]">
+            <div 
+              className="rounded-[20px] border-2 border-[#d9d9d9] bg-white p-4 sm:p-6 shadow-[0px_4px_4px_rgba(0,0,0,0.1)]"
+              style={{ flex: '1 1 calc(100% - 1rem)', minWidth: '250px', maxWidth: '350px' }}
+            >
+              <p className="text-xs sm:text-[13px] font-extrabold uppercase tracking-wide text-[#8e938a]">
                 Platform
               </p>
-              <p className="mt-2 text-[40px] font-extrabold text-black">Web</p>
-              <p className="mt-2 text-[13px] text-[#365a1a]">Mobile &amp; desktop</p>
+              <p className="mt-2 text-2xl sm:text-3xl md:text-4xl font-extrabold text-black">Web</p>
+              <p className="mt-2 text-xs sm:text-[13px] text-[#365a1a]">Mobile &amp; desktop</p>
             </div>
           </div>
         </div>

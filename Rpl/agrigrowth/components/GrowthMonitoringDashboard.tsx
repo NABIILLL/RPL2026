@@ -87,25 +87,25 @@ export default function GrowthMonitoringDashboard({
       {/* Main Content */}
       <section className="mx-auto w-full max-w-[1440px] flex-col gap-8 px-5 pb-12 sm:px-10 lg:px-14">
         {/* Field Title */}
-        <h1 className="text-center text-[56px] font-extrabold leading-normal text-[#365a1a] mt-8 mb-8">
+        <h1 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-[56px] font-extrabold leading-normal text-[#365a1a] mt-8 mb-8">
           {fieldName}
         </h1>
 
         {/* Data Table */}
         <div className="overflow-x-auto mb-8">
-          <table className="w-full border-collapse">
+          <table className="w-full border-collapse min-w-[480px]">
             <thead>
               <tr>
-                <th className="bg-[#365a1a] border-4 border-[#365a1a] px-8 py-5 text-center text-[25px] font-bold text-white whitespace-nowrap w-[317px]">
+                <th className="bg-[#365a1a] border-4 border-[#365a1a] px-4 sm:px-8 py-2 sm:py-4 text-center text-sm sm:text-lg md:text-xl font-bold text-white whitespace-nowrap">
                   Hari ke-
                 </th>
-                <th className="bg-[#365a1a] border-4 border-[#365a1a] px-8 py-5 text-center text-[25px] font-bold text-white whitespace-nowrap w-[317px]">
+                <th className="bg-[#365a1a] border-4 border-[#365a1a] px-4 sm:px-8 py-2 sm:py-4 text-center text-sm sm:text-lg md:text-xl font-bold text-white whitespace-nowrap">
                   Tinggi
                 </th>
-                <th className="bg-[#365a1a] border-4 border-[#365a1a] px-8 py-5 text-center text-[25px] font-bold text-white whitespace-nowrap w-[317px]">
+                <th className="bg-[#365a1a] border-4 border-[#365a1a] px-4 sm:px-8 py-2 sm:py-4 text-center text-sm sm:text-lg md:text-xl font-bold text-white whitespace-nowrap">
                   Jumlah Daun
                 </th>
-                <th className="bg-[#365a1a] border-4 border-[#365a1a] px-8 py-5 text-center text-[25px] font-bold text-white whitespace-nowrap w-[317px]">
+                <th className="bg-[#365a1a] border-4 border-[#365a1a] px-4 sm:px-8 py-2 sm:py-4 text-center text-sm sm:text-lg md:text-xl font-bold text-white whitespace-nowrap">
                   Jumlah Cabang
                 </th>
               </tr>
@@ -113,16 +113,16 @@ export default function GrowthMonitoringDashboard({
             <tbody>
               {measurements.map((measurement, index) => (
                 <tr key={index}>
-                  <td className="border-4 border-[#365a1a] px-8 py-5 text-center text-[25px] font-medium text-[#365a1a]">
+                  <td className="border-4 border-[#365a1a] px-4 sm:px-8 py-2 sm:py-4 text-center text-sm sm:text-base md:text-lg font-medium text-[#365a1a]">
                     {measurement.day}
                   </td>
-                  <td className="border-4 border-[#365a1a] px-8 py-5 text-center text-[25px] font-medium text-[#365a1a]">
+                  <td className="border-4 border-[#365a1a] px-4 sm:px-8 py-2 sm:py-4 text-center text-sm sm:text-base md:text-lg font-medium text-[#365a1a]">
                     {measurement.height}
                   </td>
-                  <td className="border-4 border-[#365a1a] px-8 py-5 text-center text-[25px] font-medium text-[#365a1a]">
+                  <td className="border-4 border-[#365a1a] px-4 sm:px-8 py-2 sm:py-4 text-center text-sm sm:text-base md:text-lg font-medium text-[#365a1a]">
                     {measurement.leaves}
                   </td>
-                  <td className="border-4 border-[#365a1a] px-8 py-5 text-center text-[25px] font-medium text-[#365a1a]">
+                  <td className="border-4 border-[#365a1a] px-4 sm:px-8 py-2 sm:py-4 text-center text-sm sm:text-base md:text-lg font-medium text-[#365a1a]">
                     {measurement.branches}
                   </td>
                 </tr>
