@@ -5,6 +5,26 @@ import { useRouter } from "next/navigation";
 import HeaderWithModal from "@/components/HeaderWithModal";
 import AuthModal from "@/components/AuthModal";
 import { useUser } from "@/hooks/useUser";
+import { motion } from "framer-motion";
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 30 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: "spring", stiffness: 70, damping: 15 }
+  }
+};
 
 const heroBackground =
   "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=2000&auto=format&fit=crop";
@@ -79,20 +99,26 @@ export default function Home() {
           }}
         />
 
-        <section className="mt-20 w-full max-w-[860px] sm:mt-32 lg:mt-56">
-          <h1 className="text-5xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
+        <motion.section 
+          variants={staggerContainer}
+          initial="hidden"
+          animate="show"
+          className="mt-20 w-full max-w-[860px] sm:mt-32 lg:mt-56"
+        >
+          <motion.h1 variants={fadeUpVariant} className="text-5xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl lg:text-7xl">
             Simplifying Agricultural
             <br />
             Analysis Through Digital
             <br />
             Technology.
-          </h1>
+          </motion.h1>
 
-          <p className="mt-6 max-w-[840px] text-lg leading-relaxed text-white/90 sm:text-xl lg:text-2xl">
+          <motion.p variants={fadeUpVariant} className="mt-6 max-w-[840px] text-lg leading-relaxed text-white/90 sm:text-xl lg:text-2xl">
             A digital platform that helps researcher and students record, monitor, and analyze crop data in one place. From growth tracking and cost management to harvest predictions and insights, everything is designed to support smarter and more efficient agricultural decisions.
-          </p>
+          </motion.p>
 
-          <button
+          <motion.button
+            variants={fadeUpVariant}
             onClick={handleGetStarted}
             className="mt-10 inline-flex items-center gap-3 rounded-full bg-white/75 px-6 py-3 text-base font-semibold text-black shadow-[-2px_2px_4px_rgba(0,0,0,0.25)] transition duration-200 hover:bg-white/90 sm:gap-4 sm:px-8 sm:py-4 sm:text-lg"
             type="button"
@@ -101,8 +127,8 @@ export default function Home() {
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f3b300] font-bold text-[#1a1a1a] sm:h-11 sm:w-11">
               ›
             </span>
-          </button>
-        </section>
+          </motion.button>
+        </motion.section>
       </div>
     </main>
   );

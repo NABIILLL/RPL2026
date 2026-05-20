@@ -7,6 +7,26 @@ import AuthModal from "@/components/AuthModal";
 import { useState } from "react";
 import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import AgrigrowthLogo from "../../components/AgrigrowthLogo";
+import { motion } from "framer-motion";
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 30 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: "spring", stiffness: 70, damping: 15 }
+  }
+};
 
 const imgProfile = "https://api.iconify.design/lucide:user-circle.svg?color=%23365a1a";
 
@@ -26,7 +46,7 @@ export default function About() {
           textClassName="text-[20px] font-bold leading-none text-[#365a1a] sm:text-[21px]"
         />
 
-        <nav className="hidden items-center gap-4 sm:gap-6 md:gap-10 text-sm sm:text-base md:text-lg font-bold lg:flex">
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-4 sm:gap-6 md:gap-10 text-sm sm:text-base md:text-lg font-bold lg:flex">
           <Link href={user ? "/dashboard" : "/"} className="transition hover:opacity-80">
             Home
           </Link>
@@ -107,25 +127,30 @@ export default function About() {
       </header>
 
       {/* Content */}
-      <section className="mx-auto w-full px-4 sm:px-5 py-8 sm:py-12 sm:px-10 lg:px-14">
+      <motion.section 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="mx-auto w-full px-4 sm:px-5 py-8 sm:py-12 sm:px-10 lg:px-14"
+      >
         <div className="mx-auto max-w-[1299px]">
           {/* Title */}
-          <h1 className="text-3xl font-extrabold leading-[1.2] sm:text-4xl md:text-5xl lg:text-[56px]">
+          <motion.h1 variants={fadeUpVariant} className="text-3xl font-extrabold leading-[1.2] sm:text-4xl md:text-5xl lg:text-[56px]">
             Tentang AgriGrowth Monitor
-          </h1>
+          </motion.h1>
 
           {/* Description */}
           <div className="mt-8 space-y-5 text-sm sm:text-base md:text-lg lg:text-[20px] leading-[1.6] text-[#365a1a]">
-            <p>
+            <motion.p variants={fadeUpVariant}>
               AgriGrowth Monitor adalah platform digital berbasis web yang dirancang untuk membantu
               mahasiswa pertanian dan petani dalam mencatat, memonitor, dan menganalisis data
               budidaya tanaman secara efisien. Sistem ini mendukung tiga komoditas utama: padi,
               jagung, dan bawang merah. Mulai dari logbook digital pertanian, monitoring pertumbuhan,
               hingga analisis dan visualisasi data. Karena berbasis web, aplikasi membutuhkan koneksi
               internet untuk akses penuh.
-            </p>
+            </motion.p>
 
-            <p>
+            <motion.p variants={fadeUpVariant}>
               Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget
               dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes,
               nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis,
@@ -137,7 +162,7 @@ export default function About() {
               feugiat a, tellus. Phasellus viverra nulla ut metus varius laoreet. Quisque rutrum.
               Aenean imperdiet. Etiam ultricies nisi vel augue. Curabitur ullamcorper ultricies nisi.
               Nam eget dui.
-            </p>
+            </motion.p>
           </div>
 
           {/* Stats Cards */}
@@ -151,7 +176,8 @@ export default function About() {
             }}
           >
             {/* Komoditas Card */}
-            <div 
+            <motion.div 
+              variants={fadeUpVariant}
               className="rounded-[20px] border-2 border-[#d9d9d9] bg-white p-4 sm:p-6 shadow-[0px_4px_4px_rgba(0,0,0,0.1)]"
               style={{ flex: '1 1 calc(100% - 1rem)', minWidth: '250px', maxWidth: '350px' }}
             >
@@ -162,10 +188,11 @@ export default function About() {
               <p className="mt-2 text-xs sm:text-[13px] text-[#365a1a]">
                 Padi · Jagung · Bawang Merah
               </p>
-            </div>
+            </motion.div>
 
             {/* Fitur Utama Card */}
-            <div 
+            <motion.div 
+              variants={fadeUpVariant}
               className="rounded-[20px] border-2 border-[#d9d9d9] bg-white p-4 sm:p-6 shadow-[0px_4px_4px_rgba(0,0,0,0.1)]"
               style={{ flex: '1 1 calc(100% - 1rem)', minWidth: '250px', maxWidth: '350px' }}
             >
@@ -174,10 +201,11 @@ export default function About() {
               </p>
               <p className="mt-2 text-2xl sm:text-3xl md:text-4xl font-extrabold text-black">8+</p>
               <p className="mt-2 text-xs sm:text-[13px] text-[#365a1a]">Terintegrasi penuh</p>
-            </div>
+            </motion.div>
 
             {/* Platform Card */}
-            <div 
+            <motion.div 
+              variants={fadeUpVariant}
               className="rounded-[20px] border-2 border-[#d9d9d9] bg-white p-4 sm:p-6 shadow-[0px_4px_4px_rgba(0,0,0,0.1)]"
               style={{ flex: '1 1 calc(100% - 1rem)', minWidth: '250px', maxWidth: '350px' }}
             >
@@ -186,10 +214,10 @@ export default function About() {
               </p>
               <p className="mt-2 text-2xl sm:text-3xl md:text-4xl font-extrabold text-black">Web</p>
               <p className="mt-2 text-xs sm:text-[13px] text-[#365a1a]">Mobile &amp; desktop</p>
-            </div>
+            </motion.div>
           </div>
         </div>
-      </section>
+      </motion.section>
     </main>
   );
 }

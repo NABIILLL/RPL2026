@@ -7,6 +7,27 @@ import { useUser } from "@/hooks/useUser";
 import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import { supabase } from "@/lib/supabase";
 import { toast } from "react-hot-toast";
+import { motion } from "framer-motion";
+
+// Animation variants
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 30 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: "spring", stiffness: 70, damping: 15 }
+  }
+};
 
 // Logo and profile images
 const imgLogo = "https://api.iconify.design/lucide:leaf.svg?color=%23365a1a";
@@ -216,7 +237,7 @@ export default function Dashboard() {
               <b className="text-[16px] leading-none sm:text-[18px] lg:text-[21px]">Agrigrowth Monitor</b>
             </div>
 
-            <nav className="hidden items-center gap-10 text-[16px] font-bold lg:flex xl:text-[21px]">
+            <nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-10 text-[16px] font-bold lg:flex xl:text-[21px]">
               <Link href="/dashboard" className="transition hover:opacity-80">
                 Home
               </Link>
@@ -336,7 +357,7 @@ export default function Dashboard() {
             <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
           </div>
 
-          <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
+          <nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-10 text-[21px] font-bold lg:flex">
             <Link href="/dashboard" className="border-b-2 border-[#365a1a]">
               Home
             </Link>
@@ -462,7 +483,7 @@ export default function Dashboard() {
           <b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
         </div>
 
-        <nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
+        <nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-10 text-[21px] font-bold lg:flex">
           <Link href="/dashboard" className="border-b-2 border-[#365a1a]">
             Home
           </Link>
@@ -492,32 +513,43 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <section className="bg-[#365a1a] py-14 text-white">
+      <motion.section 
+        variants={staggerContainer}
+        initial="hidden"
+        animate="show"
+        className="bg-[#365a1a] py-14 text-white"
+      >
         <div className="mx-auto grid w-full max-w-[1440px] gap-8 px-5 sm:px-10 lg:grid-cols-[290px_1fr] lg:items-center lg:gap-9 lg:px-14">
-          <div>
+          <motion.div variants={fadeUpVariant}>
             <h1 className="text-5xl font-extrabold leading-[0.95] sm:text-[75px]">Growth Tracker</h1>
             <p className="mt-1.5 text-[25px] font-semibold">Your history</p>
-          </div>
+          </motion.div>
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-[30px]">
             {cropCards.map((card) => (
-              <Link
-                key={card.id}
-                href={`/observation/${card.id}/history`}
-                className="group relative h-[360px] overflow-hidden rounded-[16px] shadow-[-6px_6px_12px_rgba(0,0,0,0.3)] transition hover:shadow-[-6px_6px_20px_rgba(0,0,0,0.5)] sm:h-[396px]"
-              >
-                <img alt={card.title} loading="lazy" className="h-full w-full object-cover transition group-hover:scale-105" src={card.image} />
-                <div className="absolute inset-x-0 bottom-0 h-[32%] bg-gradient-to-t from-[#365a1a] to-transparent transition group-hover:h-[40%]" />
-                <p className="absolute inset-x-0 bottom-3 text-center text-[18px] font-extrabold text-white transition group-hover:bottom-4">
-                  {card.title}
-                </p>
-              </Link>
+              <motion.div key={card.id} variants={fadeUpVariant}>
+                <Link
+                  href={`/observation/${card.id}/history`}
+                  className="group relative block h-[360px] overflow-hidden rounded-[16px] shadow-[-6px_6px_12px_rgba(0,0,0,0.3)] transition hover:shadow-[-6px_6px_20px_rgba(0,0,0,0.5)] sm:h-[396px]"
+                >
+                  <img alt={card.title} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-110" src={card.image} />
+                  <div className="absolute inset-x-0 bottom-0 h-[40%] bg-gradient-to-t from-[#365a1a] to-transparent opacity-80 transition duration-300 group-hover:opacity-100 group-hover:h-[50%]" />
+                  <p className="absolute inset-x-0 bottom-4 text-center text-[20px] font-extrabold text-white transition-transform duration-300 group-hover:-translate-y-2">
+                    {card.title}
+                  </p>
+                </Link>
+              </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
-      <section className="mx-auto w-full max-w-[1440px] px-5 py-10 sm:px-10 lg:px-14">
+      <motion.section 
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, type: "spring", stiffness: 70, damping: 15 }}
+        className="mx-auto w-full max-w-[1440px] px-5 py-10 sm:px-10 lg:px-14"
+      >
         <div className="mx-auto w-full max-w-[1295px] rounded-[30px] bg-white p-5 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.25),-6px_6px_15px_0px_rgba(0,0,0,0.25)] sm:rounded-[40px] sm:p-8">
           <h2 className="text-center text-[34px] font-extrabold text-[#365a1a] sm:text-[40px]">
             Create new growth tracker
@@ -541,7 +573,7 @@ export default function Dashboard() {
             </button>
           </form>
         </div>
-      </section>
+      </motion.section>
 
       {isPlantMenuOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 backdrop-blur-[3px]">

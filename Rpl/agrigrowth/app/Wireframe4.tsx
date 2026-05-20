@@ -6,6 +6,26 @@ import { useState } from "react";
 import { useLogoutConfirm } from "@/hooks/useLogoutConfirm";
 import { useUser } from "@/hooks/useUser";
 import AuthModal from "@/components/AuthModal";
+import { motion } from "framer-motion";
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15
+    }
+  }
+};
+
+const fadeUpVariant = {
+  hidden: { opacity: 0, y: 30 },
+  show: { 
+    opacity: 1, 
+    y: 0,
+    transition: { type: "spring", stiffness: 70, damping: 15 }
+  }
+};
 
 const imgComplementary3 = "https://images.unsplash.com/photo-1592982537447-6f2a6a0c5c8e?q=80&w=800&auto=format&fit=crop";
 const imgWallpaperDelDia1 = "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=2000&auto=format&fit=crop";
@@ -49,7 +69,7 @@ export default function Wireframe4() {
 					<b className="text-[20px] leading-none sm:text-[21px]">Agrigrowth Monitor</b>
 				</div>
 
-				<nav className="hidden items-center gap-10 text-[21px] font-bold lg:flex">
+				<nav className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-10 text-[21px] font-bold lg:flex">
 					<Link href={user ? "/dashboard" : "/"} className="hover:opacity-80 transition">Home</Link>
 					<Link href="/about" className="hover:opacity-80 transition">About</Link>
 					<Link href="/wireframe4" className="border-b-2 border-[#365a1a]">Features</Link>
@@ -129,14 +149,20 @@ export default function Wireframe4() {
 				)}
 			</header>
 
-			<section className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-5 pb-12 pt-6 sm:px-10 lg:px-14 lg:pt-8">
+			<motion.section 
+				variants={staggerContainer}
+				initial="hidden"
+				animate="show"
+				className="mx-auto flex w-full max-w-[1440px] flex-col gap-8 px-5 pb-12 pt-6 sm:px-10 lg:px-14 lg:pt-8"
+			>
 				{featureCards.map((feature, index) => {
 					const links = ["/features/growth-tracker", "/features/weather", "/features/overviews"];
 					return (
-						<article
+						<motion.article
+							variants={fadeUpVariant}
 							key={feature.title}
 							className="rounded-[30px] bg-white p-5 shadow-[6px_-6px_15px_0px_rgba(0,0,0,0.2),-6px_6px_15px_0px_rgba(0,0,0,0.2)] sm:p-6 group cursor-pointer hover:shadow-[6px_-6px_25px_0px_rgba(0,0,0,0.3),-6px_6px_25px_0px_rgba(0,0,0,0.3)] transition"
-							onClick={(e) => {
+							onClick={(e: React.MouseEvent) => {
 								if (!user) {
 									e.preventDefault();
 									setIsModalOpen(true);
@@ -167,10 +193,10 @@ export default function Wireframe4() {
 									</div>
 								</div>
 							</Link>
-						</article>
+						</motion.article>
 					);
 				})}
-			</section>
+			</motion.section>
 		</main>
 	);
 }
